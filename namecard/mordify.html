@@ -1,0 +1,97 @@
+
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+ 
+ <style>
+	 * { padding:0; margin:0; box-sizing:border-box; }
+	 html, body { height: 100%; overflow: hidden; }
+	#main {width: 100%; height: 100%; border-collapse: collapse; }
+	#main .th { font-size:18px; background-color: ivory; padding: 10px; border:1px solid gray; }
+	#main .td1 { width: 120px; text-align:center; padding: 6px; font-weight: bold; background-color: #e0e0e0; border: 1px solid gray;}
+	#main .td2 { padding: 6px; border: 1px solid gray; }
+	#main .td3 { background-color: ghostwhite; border: 1px solid gray; text-align: center; padding: 10px;}
+	#main input { padding: 5px; }
+	#main .btn { width: 120px; cursor: pointer; border-radius: 5px; }
+
+ </style>
+<script>
+	function Check(num) {
+		if(!document.getElementById('name').value){
+			alert('이름은 필수 항목입니다');
+			document.getElementById('name').focus();
+			return ;
+		}
+		
+		var xhr = new XMLHttpRequest(); //오브젝트를 생성했으므로, 일어나는 상태 변화를 작성
+		xhr.onreadystatechange =  function(){
+
+				if (this.readyState == 4 && this.status ==200){// 지금 현재 오브젝트가 가지고 있는 4는 클라이언트에서 서버 측으로 전상이 끝났고, 서버는 정상적으로 받았음을 의미.
+				//4xx는 클라이언트에서 서버 측으로 전송이 끝, status는 서버측에서 받은 결과 4xx로 시작하는건 클라이언트가 잘못.5xx는 서버 잘못
+				//2xx는 서비스 정상
+					if(this.responseText != 'OK'){
+						alert('	자료를 저장할 수 없습니다. 확인 후 다시 시도하십시오.');
+					}
+					else{
+						opener.location.reload();
+						self.close();
+		 			 }
+			     } 
+		};
+	
+
+	var  name = document.getElementById('name').value;
+	var tel = document.getElementById('tel').value;
+	var email = document.getElementById('email').value;
+	var etc = document.getElementById('etc').value;
+
+	xhr.open('GET', 'mordify.php?num=' + num + '&name='+ name + '&tel=' + tel + '&email=' + email + '&etc= ' + etc, true); //boolean 값은 비동기적으로 실행할지 아닌지 결정.(true)
+	xhr.send();
+	//각각의 key와 value는 &tel=tel& '=' 기호로 이루어져 있고, 구분은 &를 이용한다.
+}
+</script>
+ </head>
+ <body onLoad="document.getElementById('name').focus();">
+<?php
+$conn = mysqli_connect('localhost','kswj1510',rlaehdrjs,'kswj1510') or die('DB서버에 접속할 수 없습니다. 관리자에 문의하십시오');
+$result = mysqli_query($conn, "select *from namecard where num = {$_GET['num']} limit 1") or die('요청한 쿼리를 실행할 수 없습니다');
+$row = mysqli_fetch_array($result);
+?><!-- mysqli_connect('ip', 'db에 개설된 사용자 이름', '비밀번호' '데이터베이스명'); 
+$result = mysqli_query($conn, "") or die('요청한 쿼리를 실행할 수 없습니다'); 매개변수로 넘어오는 자료 보내기 ?로 보내면 get방식
+result는 값은 하나만 받는다--> 
+
+  <table id="main">
+	<tr>
+		<th colspan = "2" class = "th"> 자 료 입 력 </th>
+	</tr>
+	<tr>
+		<td class = "td1"> 이름 </td>
+		<td class = "td2"> <input type="text" value = "<?=$row['name'];?>"  id="name" size="12"  maxlength = "12"> </td>
+	</tr>
+	<tr>
+		<td class = "td1"> 전화번호 </td>
+		<td class = "td2"> <input type="text" value = "<?=$row['tel'];?>" id = "tel"size="35"   maxlength = "15"> </td>
+	</tr>
+	<tr>
+		<td class = "td1"> 이메일</td>
+		<td class = "td2"> <input type="text" value = "<?=$row['email'];?>" id="email" size="30" maxlength = "50"> </td>
+	</tr>
+	<tr>
+		<td class = "td1"> 비고 </td>
+		<td class = "td2"> <input type="text" value = "<?=$row['etc'];?>" id="etc" size="30" maxlength = "80"> </td>
+	</tr>
+	<tr>
+		<td colspan="2" class = "td3">
+			<input type="button" value="확인" onClick="Check(<?=$row['num'];?>);" class="btn"/>
+			<input type="button" value="취소" onClick="self.close();" class="btn"/>
+		</td>
+	</tr>
+  </table>
+  <?php
+  mysqli_free_result($result);
+  mysqli_close($conn);
+  ?>
+ </body>
+</html>

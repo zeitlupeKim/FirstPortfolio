@@ -1,0 +1,136 @@
+<?php
+include_once '../header.inc.html';
+?>
+
+<link rel="stylesheet" href="view/view.content.css">
+
+<script src="control/view.content.js"></script>
+<div id="contents">
+<?php
+include_once '../db.inc.php';
+
+//현재 메뉴의 이름은 repository이고 테이블은 repository0
+$table = isset($_GET['table']) ? $_GET['table'] : 'repository0';
+$page = isset($_GET['page']) ? $_GET['page'] : '1';
+$field = isset($_GET['field']) ? $_GET['field'] : '';
+$val = isset($_GET['val']) ? $_GET['val'] : '';
+
+$result = DBQuery("select * from {$_GET['table']} where num = {$_GET['num']} limit 1");
+$row = mysqli_fetch_array($result);
+$num = $row['num'];
+$name = $row['name'];
+$title = $row['title'];
+$content = $row['content'];
+$wr_date = date('Y-m-d H:i', $row['wtime']);
+$ip = $row['ip'];
+$ref = $row['ref'];
+$file = $row['file'];
+$isPrivate = $row['isPrivate'];
+
+
+mysqli_free_result($result);
+?>
+
+	<table id="mainTable">
+		<tr>
+			<td class="td1">이 름</td>
+			<td class="td2">
+				<b><?=$name;?></b>
+				<div style="float: right; text-align: right;">
+					업로드 : <?=$wr_date;?> <span style="color: silver;">|</span> IP : <?=$ip;?> <span style="color: silver;">|</span> 읽음 : <?=$ref;?>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td class="td1">제 목</td>
+			<td class="td2"><b><?=$title;?></b></td>
+		</tr>
+		<tr>
+			<td class="td1">내 용</td>
+			<td class="td2"><?=nl2br(strip_tags($content));?></td>
+		</tr>
+<?php
+//explode함수: 파일이 하나면 1개짜리 배열, 파일이 3개면 3개짜리 배열이 만들어 짐.
+$files = explode(':', $file);
+?>
+    
+		<tr>
+			<td class="td1">첨부 파일</td>
+			<td class="td2">
+<?php
+for($i = 0; $i < count($files); $i++){ 
+
+    if ($i != 0){ 
+        echo "&nbsp;<span style='color:silver;'> | </span>&nbsp;";
+    }
+       echo <<< _LINK_
+        $files[$i] <a href="download.php?table=$table&fname=$files[$i]"><img src="download.png" title="다운로드합니다." style="width:16px; vertical-align:text-bottom;"/></a>
+    _LINK_;
+}        
+?>			    		    
+<!--fname bedeutet ein File name-->
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2" class="td3">
+				<input type="button" value="수정" onClick="Modify('<?=$_GET['table'];?>', <?=$_GET['num'];?>, <?=$_GET['page'];?>, '<?=$_GET['field'];?>', '<?=$_GET['val'];?>');" class="btn"/>
+				<input type="button" value="삭제" onClick="Delete('<?=$_GET['table'];?>', <?=$_GET['num'];?>, <?=$_GET['page'];?>, '<?=$_GET['field'];?>', '<?=$_GET['val'];?>');" class="btn"/> &nbsp; &nbsp; 
+				<input type="button" value="목록으로" onClick="location.href='index.html?table=<?=$_GET['table'];?>&page=<?=$_GET['page'];?>&field=<?=$_GET['field'];?>&val=<?=$_GET['val'];?>';" class="btn"/>
+			</td>
+		</tr>
+	</table>
+
+	<div id="cmtsContainer">
+<?php
+//댓글의 카운트를 세는데 해당 테이블의 댓글에 대해서만
+$result = DBQuery("select count(num) from {$_GET['table']}_cmts where b_num = {$_GET['num']}");
+$row = mysqli_fetch_row($result);
+$cmtsCount = $row[0];
+?>
+		<div>
+			▒ 댓글 : <b><span id="cmtsCount"><?=$cmtsCount;?></span></b> 개
+		</div>
+		<div id="cmts_input">
+			<table>
+				<tr>
+					<td class="cmt_th1">이름</td>
+					<td class="cmt_th2">댓 &nbsp; &nbsp; 글</td>
+					<td class="cmt_th3">확 인</td>
+				</tr>
+				<tr>
+					<td class="cmt_td1"><form name="commentForm" style="display:inline;"><input type="text" id="name" name="name" maxlength="255"/></td>
+					<td class="cmt_td2"><textarea id="comment" name="comment" max="255"></textarea></td>
+					<td class="cmt_td3"><input type="button" id="btn"value="댓글 등록" onClick="SaveCmt(this.form,'<?=$_GET['table'];?>', <?=$_GET['num'];?>);"/></form></td>
+				</tr>
+			</table>
+		</div>
+		<div id="cmts_list">
+<?php
+if ($cmtsCount > 0) {
+	$cmts = DBQuery("select * from {$_GET['table']}_cmts where b_num = {$_GET['num']} order by num asc");
+	while($cmt = mysqli_fetch_array($cmts)) {
+		$wtime = date('Y년 n월 j일 H시 i분', $cmt['wr_time']);
+?>
+			<fieldset>
+				<legend>[ <b><?=$cmt['name'];?></b> ] &nbsp;<span style='color: silver;'>|</span>&nbsp; [ 시각 : <?=$wr_time;?> ] &nbsp;<span style='color: silver;'>|</span>&nbsp; [ IP : <?=$cmt['ip'];?> ]</legend>
+				<?=nl2br($cmt['comment']);?>
+				<div style='text-align: right; padding-right: 30px;'>
+					<input type="button" value="좋아요" class="btn2" onClick="IncGood('<?=$_GET['table'];?>', <?=$cmt['num'];?>);"/> <span id="cmt_good_<?=$cmt['num'];?>"><?=$cmt['good'];?></span> &nbsp;<span style="color: silver;">|</span>&nbsp; 
+					<input type="button" value="싫어요" class="btn2" onClick="IncBad('<?=$_GET['table'];?>', <?=$cmt['num'];?>);"/> <span id="cmt_bad_<?=$cmt['num'];?>"><?=$cmt['bad'];?></span>
+				</div>
+			</fieldset>
+<?php
+	}
+}
+
+DBQuery("update {$_GET['table']} set ref = ref + 1 where num = {$_GET['num']} limit 1");
+DBClose();
+
+?>
+		</div><!-- cmts_list-->
+	</div><!-- END Of cmtsContainer -->
+</div><!-- End Of Contents-->
+
+<?php
+include_once '../footer.inc.html';
+?>

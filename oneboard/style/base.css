@@ -1,0 +1,7 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; overflow-y:hidden; overflow-x: hidden;  font-family: 'Dosis', sans-serif;}
+a:link, a:visited, a:active { text-decoration:none; color: black;}
+a:hover { text-decoration: underline; color: red; font-weight: bold; }
+#header { position: fixed; top: 0; width: 1000px; left: 50%; margin-left: -500px; background-color: darkred; height: 60px; line-height: 60px; text-align: center; border-top: 5px solid white; font-size: 20px; font-weight: bold; }
+#contents { width: 1000px; margin: 60px auto 40px auto; overflow-y:auto; height: calc(100% - 94px); }
+#footer { position: fixed; bottom: 0;width: 1000px; left: 50%; margin-left: -500px; height: 40px; line-height: 36px; background-color: black; color: white; text-align: center; border-bottom: 5px solid white; }

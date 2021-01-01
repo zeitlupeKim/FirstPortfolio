@@ -1,0 +1,102 @@
+<!DOCtype html>
+<html>
+<head>
+	<meta charset="UTF-8">
+</head>
+<body>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; overflow: hidden; }
+#mainTable { width: 100%; height: 100%; border-collapse: collapse; border-top: 2px solid black; border-bottom: 2px solid black; }
+.th { background-color: lightblue; padding: 10px; border: 1px gray solid; }
+.td1 { width: 150px; text-align: right; padding: 8px 12px 8px 0; border: 1px gray solid; background-color: #e0e0e0; }
+.td2 { padding: 8px 0 8px 12px; border: 1px gray solid; }
+.td3 { padding: 10px; border: 1px gray solid; background-color: #f0f0f0; text-align: center; }
+.btn { width: 120px; cursor: pointer; padding: 3px;}
+.input { padding: 4px; }
+</style>
+
+<script>
+function Check(form) {
+	if (!form.name.value) {
+		alert('이름을 입력하십시오.');
+		form.name.focus();
+		return;
+	}
+
+	if (!form.title.value) {
+		alert('제목을 입력하십시오.');
+		form.title.focus();
+		return;
+	}
+
+	if (!form.pic.value) {
+		alert('업로드할 사진을 선택하십시오.');
+		form.pic.focus();
+		return;
+	}
+
+	if (!form.pw.value) {
+		alert('비밀번호를 입력하십시오.');
+		form.pw.focus();
+		return;
+	}
+
+	var fData = new FormData(form);
+	var xhr = new XMLHttpRequest();
+	xhr.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			if (this.responseText == 'FILE_NOT_UPLOADED') {
+				alert('파일이 업로드되지 않았습니다. 네 맘대로 하든지 말든지...');
+			}
+			else if (this.responseText == 'SAME_FILE_EXISTS') {
+				alert('같은 이름을 가진 파일이 있습니다. 이름을 바꾼 후 다시 업로드 하든가 말든가...');
+			}
+			else if (this.responseText == 'MOVE_FAIL') {
+				alert('파일을 저장할 수 없습니다. 네가 할 수 있는 것은 없어야.');
+			}
+			else if (this.responseText == 'OK') {
+				opener.location.reload();
+				self.close();
+			}
+		}
+	};
+
+	xhr.open('POST', 'upload.pic2.php', true);
+	xhr.send(fData);
+}
+</script>
+
+</head>
+<body onLoad="document.forms[0].name.focus();">
+<form method="post" enctype="multipart/form-data" style="display: inline;">
+	<table id="mainTable">
+		<tr>
+			<th colspan="2" class="th">사진 올리기</th>
+		</tr>
+		<tr>
+			<td class="td1">올린이</td>
+			<td class="td2"><input type="text" size="15" maxlength="12" name="name" class="input"/></td>
+		</tr>
+		<tr>
+			<td class="td1">제 &nbsp; 목</td>
+			<td class="td2"><input type="text" size="40" maxlength="30" name="title" class="input"/></td>
+		</tr>
+		<tr>
+			<td class="td1">사 &nbsp; 진</td>
+			<td class="td2"><input type="file" accept="image/*" name="pic"/></td>
+		</tr>
+		<tr>
+			<td class="td1">비밀번호</td>
+			<td class="td2"><input type="password" size="15" name="pw" class="input"/></td>
+		</tr>
+		<tr>
+			<td colspan="2" class="td3">
+				<input type="button" value="확인" onClick="Check(this.form);" class="btn"/>
+				<input type="button" value="취소" onClick="self.close();" class="btn"/>
+			</td>
+		</tr>
+	</table>
+</form>
+</body>
+</html>

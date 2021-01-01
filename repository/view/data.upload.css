@@ -1,0 +1,11 @@
+/*Setting Contents*/
+#contents { width: 1000px; margin: 20px auto 0 auto; }
+    
+/*Setting Table*/
+#mainTable { width: 100%; margin: 0 auto;  }
+#mainTable .th { padding: 15px; background-color: rgb(250,250,250); color:rgb(30,30,30); border-collapse:collapse;}
+#mainTable .td1 { width: 250px; text-align: right; padding: 8px 16px 8px 8px; background-color: none; text-align:center; }
+#mainTable .td2 { padding: 8px 8px 8px 16px; border-bottom:1px solid silver; }
+#mainTable .td3 { padding: 15px; text-align: center; background-color: rgb(250,250,250);}
+#mainTable input, textarea { padding: 3px; }
+#mainTable .btn { width: 120px; cursor:pointer; border-radius: 6px; }

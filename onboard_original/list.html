@@ -1,0 +1,262 @@
+<?php
+setcookie('board_list_view', md5('yes'), 0, '/'); 
+?>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="Author" content="">
+<meta name="Keywords" content="">
+<meta name="Description" content="">
+<title>OneBoard</title>
+<link rel="stylesheet" href="./style/base.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:wght@300&family=Dosis&display=swap" rel="stylesheet"> 
+ <style>
+ #header { background-color: darkred; color: white; font-size:2em; line-height: 55px;}
+ #mainTable { width: 100%; border-collapse: collapse; border-top: 2px solid black; border-bottom: 2px solid bottom; table-layout: fixed; }
+ 
+#bInfo{width:100%; margin-top: 5px; }
+.notice { width: 40px; background-color: lightgray; color: brown; font-size: 10px; border-radius : 5px; padding: 3px;}
+ .th { background-color: ghostwhite; 5px; color:brown;}
+ .td { border: 1px solid silver; padding: 8px; }
+ #pageLink { margin-top: 5px; text-align:center;}
+ #outer { width: 100%; display:flex; }
+ #outer > #numList { width: 50%; }
+ #outer > #numList > #lists_per_page { width: 50px; padding: 3px 1px; text-align: center; font-weight: bold; } 
+ #outer > #search { width: 50%; text-align: right; }
+ #dataInput { margin-top: 5px; text-align: center; background-color: darkred;margin-top: 10px;}
+ #dataInput a {color:white; font-weight: bold; font-size: 25px;}
+ #b_bInfo { width:100%;}
+ </style>
+ <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+ <script>
+ function AdminMode(bTitle,table){
+	 var w= 400;
+	 var h = 300;
+	 var x = (screen.width - w) / 2;
+	 var y = (screen.height - h) / 2;
+	 window.open('admin.html?bTitle=' + bTitle + '&table=' + table,  'admin', 'width=' + w + ',height=' + y + ', left=' + x + ', top=' + y); //bTitle은 매개변수로 넘어온 토큰
+}
+
+function SetLists(){ //화면제어
+	let list = document.getElementById('lists_per_page').value;
+	let today = new Date(); //현시점, 오늘
+	let exp =  new Date(today.getTime() + 86400 * 1000 * 90);//만료시간 변수. 현지 시점을 기준으로 미래 날짜를 구한다. 90일 이후의 날짜 만들기
+	document.cookie = 'lists_per_page=' + list + '; expires=' + exp.toGMTString();
+	location.reload();
+}
+
+function SetFocus(form){
+	if(form.field.options.selectedIndex == 0){
+			//검색 상태에서 빠져 나오도록 한다.
+		form.val.value = "";
+		form.submit();
+	}
+	else{
+		form.val.value = "";
+		form.val.focus();
+	}
+}
+
+</script>
+ </head>
+ <body>
+  <div id="header">
+  Die Notiz für etw. in diesem Web-Site
+   </div>
+	
+   <div id="contents">
+  <?php 
+  include_once '../db.inc.php'; //mariaAdmin 연결 관련
+
+  $lists_per_page = isset($_COOKIE['lists_per_page']) ? $_COOKIE['lists_per_page'] : 10;
+  $links_per_page = 15;
+
+  $page = isset($_GET['page']) ? $_GET['page'] : 1;  //페이지는 현재 페이지를 의미함.
+  $field = isset($_GET['field']) ? $_GET['field'] : '';
+  $val = isset($_GET['val']) ? $_GET['val'] : '';
+  
+  //만약 field나 value가 값을 가지고 있지 않으면 값을 비워버린다.
+
+  $msg = '검색된 자료수'; //message box
+  $search = '';
+  if(!$field || !$val){
+	$field='';
+	$val = '';
+	$msg = '총 자료수'; 
+  }
+  else{
+	$search = "and $field like '%$val%'"; 
+  }
+
+
+  $table = isset($_GET['table']) ? $_GET['table'] : 'board0'; //만약 $table에 값이 존재하면, $table 값으로 셋팅, 그렇지 않으면 board0
+  $b_title = '자유게시판'; 
+  switch($table){
+	  case 'board1' : $b_title = '질문과 답'; break;
+	  case 'board2' : $b_title = '공지사항'; break;
+	  }
+
+	  //$result = DBQuery("select count(num) from $table");
+	  //$row = mysqli_fetch_row($result);
+	  //$totalCount = $row[0];
+	  	
+	  $totalCount = mysqli_fetch_row(DBQuery("select count(num) from $table where 1 $search"))[0]; 
+	  $totalPage = ceil($totalCount / $lists_per_page); //ceil함수는 소숫점 자리의 숫자를 무조건 올리는 함수.
+
+	  if($page > $totalPage){
+		$page = $totalPage;
+	  }
+  ?>
+
+<table id="b_bInfo"><!-- board Information-->
+	<tr>
+<?php
+	if(isset($_COOKIE['admin']) && $_COOKIE['admin'] == md5($table)){
+?>
+<td width="50%">+<?=$b_title;?> - [ <a href="admin.out.php">관리자모드 ]</td>
+<?php
+}
+else{
+?>
+
+		<td width="50%"><span onClick="AdminMode('<?=$b_title;?>','<?=$table;?>');" style="cursor:pointer">＋</span><?=$b_title;?></td>
+<?php
+}
+?>
+		<td align="right"> <?=$msg;?> : <b><?=$totalCount;?></b> [ <?=$page;?> / <?=$totalPage;?> ]</td>
+	</tr>
+</table>
+
+<table id="mainTable">
+	<tr>
+		<th class="th" width="70" >Nummer</th>
+		<th class="th" >Title</th>
+		<th class="th" width="110">Autor</th>
+		<th class="th" width="120">Datum</th>
+		<th class="th" width="70">views</th>
+	</tr>
+<?php
+if ($totalCount > 0) {
+	//총 게시물 숫자 - (페이지 - 1) * 페이지당 리스트 갯수, 예를 들어 1페이지일 때, 18 - (1 -1 ) * 18 = 18개
+	$vnum = $totalCount - ($page - 1) * $lists_per_page; //페이지당 게시물 수
+	$start = ($page - 1) * $lists_per_page; //시작
+	$result = DBQuery("select * from $table where 1 $search order by cat desc, num desc limit $start, $lists_per_page"); //결괏값
+	while($row = mysqli_fetch_array($result)) {
+	$title = htmlspecialchars($row['title']);
+	$wr_date = date('Y-m-d', $row['wr_date']); //게시물이 올라온 시간까지의 유닉스 시간을 이용하여 YYYY-MM-DD 형태로 출력
+	$num = ($row['cat'] == 10) ? "<div class='notice'>공지</div>" : $vnum;  	// num이라는 변수에 카테고리의 내용==10 이 참이면 공지사항이 들어가고, 그렇지 않으면 vnum이 들어간다. 
+		$cmtCount = mysqli_fetch_row(DBQuery("select count(num) from {$table}_cmts where b_num = {$row['num']}"))[0];
+		$cmt = ($cmtCount > 0) ? "<span style='color: darkred;';>[$cmtCount]</span>" : "";
+		
+		
+		echo <<< TR
+		<tr>
+			<td class="td" width="70" align="center">$num</td>
+			<td class="td" style="padding-left: 12px; white-space:nowrap; text-overflow: ellipsis; overflow: hidden; "><a href="view.content.html?table=$table&num={$row['num']}&page=$page&field=$field&val=$val">$title</a>$cmt </td>
+			<td class="td" width="110"  style="padding-left: 12px; white-space:nowrap; text-overflow: ellipsis; overflow: hidden; text-align:center; ">{$row['name']}</td>
+			<td class="td" width="120" align="center">$wr_date</td>
+			<td class="td" width="70" align="center">{$row['ref']}</td>
+		</tr>
+TR;
+	
+		$vnum--;
+	}
+}
+else {
+?>
+		<tr>
+			<td colspan="5" style="text-align: center; height: 100px; color: gray; border: 1px solid silver;">입력된 자료가 없습니다. 첫 글을 올리는 영광을 누리든가 말든가...</td>
+		</tr>
+<?php
+	}
+?>
+</table>
+<?php
+if($totalCount > 0){ //총 게시물 숫자
+?>
+	<div id="pageLink">
+<?php
+	$block = ceil($page / $links_per_page); //ceil함수는 소숫점 자리의 숫자를 무조건 올리는 함수, block은 현재 페이지를 만듦.
+	
+	$sp = ($block - 1) * $links_per_page + 1; //sp는 가장 앞에 있는 페이지
+	$lp = $block  * $links_per_page; //lp는 가장 마지막에 있는 페이지
+	if ($lp > $totalPage) {
+		$lp = $totalPage;
+	}	
+
+	if ($block > 1) { //만약 현재 페이지가 1보다 크다면, 페이지가 여럿임을 의미하므로 앞으로가기 버튼 생성
+		echo "<a href='list.html?table=$table&field=$field&val=$val&page=" . ($sp - 1) . "'>◁</a>";
+	}
+	
+	for($p = $sp; $p <= $lp; $p++){
+		if ($p == $page){
+			echo "&nbsp; <span style='color:darkred;fonts-weight: bold;'>$p</span> &nbsp;";
+		}
+		else{
+			echo "&nbsp; <a href='list.html?=$table&field=$field&val=$val&page=$p'>$p</a> &nbsp;";
+		}
+	}
+
+	if ($lp < $totalPage) {
+		echo "<a href='list.html?table=$table&field=$field&val=$val&page=" . ($lp + 1) . "'>▷</a>";
+	}
+
+?>
+	</div>
+<?php
+}
+?>
+<div id="outer">
+	<div id="numList"> <!--화면당 목록 수-->
+	목록수<input type="number" id="lists_per_page" value="<?=$lists_per_page;?>" min="5" max="50" onChange="SetLists();">
+	</div>
+	<div id="search"> <!--검색 폼-->
+		<form name="schForm" method="get"  style="display: inline;">
+			<select name="field" style="padding:6px;" onChange = SetFocus(this.form);>
+				<option value=""> ---------------------</option>
+				<option value="title" <?=($field == 'title') ? 'selected' : ''?> > 제목</option><!-- echo를 하는데, field 변수에 들어있는 값이 title하고 같으면  'selected' 또는 ""이다.  -->
+				<option value="content" <?=($field == 'content') ? 'selected' : ''?>> 내용</option>
+				<option value="name" <?=($field == 'name') ? 'selected' : ''?>> 저자</option>
+			</select>
+			<input type="text" placeholder="검색 내용 입력" name="val" value="<?=$val;?>" size="15" style="padding:6px;"/>
+			<input type="submit" value="검색" style="padding:6px 20px; cursor:pointer; border-radius: 5px; margin-bottom:15px;"/>
+		</form>
+	</div>
+</div>
+
+<?php
+if((isset($_COOKIE['admin']) && $_COOKIE['admin'] == md5($table)) || ((!isset($_COOKIE['admin']) || $_COOKIE['admin'] != md5($table)) && ($table != 'board2'))){
+?>
+
+<div id="dataInput"><a href="input.data.html?table=<?=$table;?>">Einschreiben </a></div>
+
+<?php
+}
+?>
+
+<!--<?php
+if((isset($_COOKIE['admin']) && $_COOKIE['admin'] == md5($table)) || ((!isset($_COOKIE['admin']) || $_COOKIE['admin'] != md5($table)) && ($table != 'board2'))){
+?>
+-->
+<!--<div id="dataInput"><a href="input.data.html?table=<?=$table;?>">Einschreiben </a></div>-->
+<!--
+<?php
+}
+?>-->
+
+
+<div id="footer">
+&copy; copyrighted by kim 
+</div>
+
+</body>
+<script>
+	$('#dataInput').hide().fadeIn(5000);
+	$('tr:odd').find('a').fadeOut('slow');
+	$('tr:odd').find('a').fadeIn('slow');
+
+	$('tr:even').css('background','silver');
+
+</script>
+</html>

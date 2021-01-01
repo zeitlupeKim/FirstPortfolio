@@ -1,0 +1,3 @@
+[1012/120813.657:ERROR:filesystem_win.cc(129)] GetFileAttributes C:\Users\kswj1\AppData\Local\Microsoft\Edge\User Data\Crashpad\attachments\1fea4873-53c8-4145-87d7-ac165193cb14: 지정된 경로를 찾을 수 없습니다. (0x3)
+[1012/120813.666:ERROR:filesystem_win.cc(129)] GetFileAttributes C:\Users\kswj1\AppData\Local\Microsoft\Edge\User Data\Crashpad\attachments\7a110109-6928-405a-bc23-7b99277c01ba: 지정된 경로를 찾을 수 없습니다. (0x3)
+[1012/120813.667:ERROR:directory_reader_win.cc(43)] FindFirstFile: 지정된 경로를 찾을 수 없습니다. (0x3)

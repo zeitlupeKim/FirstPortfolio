@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="Author" content="HOLOSoft"/>
+    <meta name="Keywords" content="mobile"/>
+    <meta name="Description" content="mobile"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>제목</title>
+    <link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
+    <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+</head>
+<body>
+<div data-role="page" id="page1">
+    <div data-role="header" data-position="fixed">
+        <h1>Dialog box 사용하기</h1>
+    </div>
+    <div data-role="content" class="ui-content">
+       <h3> Bar layout </h3>
+       <div class="ui-bar ui-bar-6" > 
+           <h4>진달래</h4>
+           <p>참꽃 또는 두견화라고도 하며, 우리나라의 모든 산야에 무리지어 자란다.</p>
+       </div>
+       <hr>
+       <h3>Grid layout</h3>
+       <div class="ui-grid-c"> <!--테이블 개념, 행 갯수와 열의 개수는 ui-block-{a,b,c} -->
+          <div class="ui-block-a"> 1행 1열 </div>
+          <div class="ui-block-b"> 1행 2열 </div>
+          <div class="ui-block-c"> 1행 3열 </div> 
+          
+          <div class="ui-block-a"> 2행 1열 </div>
+          <div class="ui-block-b"> 2행 2열 </div>
+          <div class="ui-block-c"> 2행 3열 </div> 
+          
+          <div class="ui-block-a"> 3행 1열 </div>
+          <div class="ui-block-b"> 3행 2열 </div>
+          <div class="ui-block-c"> 3행 3열 </div> 
+       </div>
+       <hr>
+       <h3>Collapsable panel layout</h3>
+       <div data-role="collapsible" data-collapsed = "false">
+           <h4> 접이식 패널 제목 </h4>
+           <p> 좁은 화면 영역을 효율적으로 사용하기 위한 방법이다. </p>
+       </div>
+       <hr>
+       <div data-role="collapsible">
+           <h4> 접이식 패널 제목 </h4>
+           <p> 좁은 화면 영역을 효율적으로 사용하기 위한 방법이다. </p>
+           <div data-role="collapsible">
+               <h4>중첩된 접이식 패널 제목</h4>
+               <p>접이식 패널 안에 접이식 패널을 넣을 수도 있습니다. 물론 다단계로 중첩될 수 있습니다.</p>
+           </div>
+       </div>
+       <hr>
+       <div data-roll="collapsible-set" data-theme="b" data-content-theme="b">
+           <div data-role="collapsible">
+                <h4>그룹 접이식 패널 제목 2</h4>
+                <p> 모바일 기기의 좁은 화면을 사용하기 위한 것이니, 많이 활용하면 좋을 것 같습니다. </p>
+           </div>   
+       </div>
+       <div data-roll="collapsible-set" data-theme="b" data-content-theme="e">
+           <div data-role="collapsible">
+                <h4>그룹 접이식 패널 제목 3</h4>
+                <p> 모바일 기기의 좁은 화면을 사용하기 위한 것이니, 많이 활용하면 좋을 것 같습니다. </p>
+           </div>   
+       </div>
+       <div data-roll="collapsible-set" data-theme="b" data-content-theme="e">
+           <div data-role="collapsible">
+                <h4>그룹 접이식 패널 제목 4</h4>
+                <p> 모바일 기기의 좁은 화면을 사용하기 위한 것이니, 많이 활용하면 좋을 것 같습니다. </p>
+           </div>   
+       </div>
+    </div>
+    <div data-role="footer" data-position="fixed">
+        <h4>테스트</h4>
+    </div>
+</div>
+</body>
+</html>

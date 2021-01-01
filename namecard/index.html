@@ -1,0 +1,75 @@
+<?php
+include_once '../header.inc.html';
+?>
+<style>
+/*padding-left는 세로로 스크롤바가 생기면 스크롤바에 의해 레이아웃이 흐트러짐. 레이아웃 보정을 위해서 vw라는 단위, 즉 스크롤바를 포함한 전체 폭으로 계산*/
+#list { width: 1000px; margin: 0 auto; margin: 10px auto 5px auto; font-size: 15px; padding-left: calc((100vw - 100%) / 2); } 
+#listTable { width: 100%; border-collapse: collapse; }
+#listTable .th { background-color: #281F1D; padding: 5px; border: 1px solid gray; color:rgb(240,240,240); }
+#listTable .td { padding: 5px; border: none; color:rgb(30,30,30); border-bottom:1px solid silver;}
+#listTable tr:hover {background-color: #6066AD;}
+#listTable tr: {background-color:rgb(250,250,250); color:rgb(30,30,30);}
+#list a { text-decoration: none:  ; color: rgb(30,30,30);}
+#list a:hover { text-decoration:underline; color:red; font-weight: bold;}	
+#listTable .center { text-align: center; }
+#inputData { padding: 10px; text-align: right; }
+</style>
+
+<script>
+function Input() {
+	var w = 600;
+	var h = 340;
+	var x = (screen.width - w) / 2;
+	var y = (screen.height - h) / 2;
+
+	window.open('input2.html', 'inputData', 'left=' + x + ', top=' + y + ', width=' + w + ', height=' + h);
+
+}
+
+function Modify(num) {
+	var w = 600;
+	var h = 340;
+	var x = (screen.width - w) / 2;
+	var y = (screen.height - h) / 2;
+
+	window.open('mordify.html?num=' + num, 'modifyData', 'left=' + x + ', top=' + y + ', width=' + w + ', height=' + h);
+}
+</script>
+
+<?php
+include_once '../db.inc.php';
+$result = DBQuery("select * from namecard order by num desc");
+?>
+<div id="list">
+	<table id="listTable">
+		<tr>
+			<th class="th" width="50">번호</th>
+			<th class="th" width="80">이름</th>
+			<th class="th" width="140">전화번호</th>
+			<th class="th" width="180">이메일</th>
+			<th class="th">비고</th>
+			<th class="th" width="110">관리</th>
+		</tr>
+<?php
+while($row = mysqli_fetch_array($result)) {
+	echo <<< TR
+		<tr>
+			<td class='td center' width='50'>{$row['num']}</td>
+			<td class='td center' width='80'>{$row['name']}</td>
+			<td class='td center' width='140'>{$row['tel']}</td>
+			<td class='td' width='180'>{$row['email']}</td>
+			<td class='td'>{$row['etc']}</td>
+			<td class='td center' width='110'><a href="javascript: void(0);" onClick="Modify({$row['num']});">수정</a> | <a href="delete.php?num={$row['num']}" onClick="return confirm('진짜로 지워부까?');">삭제</a></td>
+		</tr>
+TR;
+}
+
+DBClose($result);
+?>
+	</table>
+	<div id="inputData"><a href="javascript: void(0);" onClick="Input();">자료 입력</a></div>
+</div>
+
+<?php
+include_once '../footer.inc.html';
+?>

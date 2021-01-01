@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="Author" content="HOLOSoft"/>
+    <meta name="Keywords" content="mobile"/>
+    <meta name="Description" content="mobile"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>제목</title>
+    <link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
+    <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+</head>
+<body>
+<div data-role="page" id="page1">
+    <div data-role="header" data-position="fixed">
+        <h1>Dialog box 사용하기</h1>
+    </div>
+    <div data-role="content" class="ui-content">
+        <p>여기는 data-role이 page인 문서입니다</p>
+        <a href="#dialog1" data-role="button" data-rel="dialog">대화상자 페이지 1</a>
+        <a href="#dialog2" data-role="button">대화상자형 페이지 2</a>
+    </div>
+</div>    
+<div data-role="page" id="dialog1">
+    <div data-role="header" data-position="fixed">
+        <h1>Dialog1</h1>
+    </div>
+    <div data-role="content" class="ui-content">
+        <p>page인데 dialog로 호출을 당한 문서</p>
+        <a href="#page1" data-role="button">기본형 페이지 1</a>
+        <a href="#dialog2" data-role="button">대화상자형 페이지 2</a>
+    </div>
+</div>
+<div data-role="dialog" id="dialog2">
+    <div data-role="header" data-position="fixed">
+        <h1>Dialog2</h1>
+    </div>
+    <div data-role="content" class="ui-content">
+        <p>대화상자형 페이지2</p>
+        <a href="#page1" data-role="button">기본형 페이지 1</a>
+        <a href="#dialog1" data-role="button">대화상자형 페이지 1</a>
+    </div>
+</div>
+</body>
+</html>

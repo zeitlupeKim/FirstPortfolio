@@ -1,0 +1,96 @@
+<?php
+include_once 'header.inc.html';
+?>
+<link rel="stylesheet" href="./css/main.css">
+
+<div id="banner">
+    <div id="bannerPhoto" style="background-image:url(./image/simplity.jpg);" > <span>둘러보기</span></div>
+    <div id="banner_title">
+       <div id="title_content1"> 
+            Zeitlupe_kim이 생각하는
+        </div>
+        <div id="title_content2"> 
+            단순함의 미학,
+        </div>
+        <span id="title_content3">어디에서도, 모든 것들과 조화를 이루다</span><br>
+    </div>
+</div>
+
+<div id="bestMoment">
+    <div style="text-align:center; position:relative;  font-size: 20px;">
+        
+    </div>
+    <div id="bestMoment_foto">
+        <div id="slide_1" style="background-image:url(/imagesSide/photo1.jpg)"></div>
+        <div id="slide_2" style="background-image:url(./imagesSide/photo2.jpg);"></div>
+        <div id="slide_3" style="background-image:url(./imagesSide/photo3.jpg);"></div>
+        <div id="slide_4" style="background-image:url(./image/background1.jpg);"></div>
+        <div id="slide_5" style="background-image:url(./image/background.jpg);"></div>
+    </div>
+    <div id="bestMoment_Item" style="text-align:center;">
+       <span style="font-size:30px; display:block; left:0; ">갤러리에서 보다 다양한 사진들을 구경하세요</span>
+        <div id="moreView" >자세히보기</div>
+    </div>
+</div>
+	
+<div id="contents" style="display:flex;">
+  <div id="contentLeft" style="background-image:url(image/background.jpg); background-size:100% 100%;"></div>
+	<div id="new">
+	<div id="new_title" style="border-bottom: 1px solid rgb(240,240,240); width:100%; height: 30px;">최신글</div>
+		<ul>
+<?php
+    include_once './db.inc.php';
+		$tableList = array('board2' => '공지사항', 'board1' => '질문과 답','board0' => '자유게시판');
+
+	//연관배열. =>이 의미하는 것은 예를 들어, board2라는 키에다가 공지사항이라는 값을 넣는다. 키가 순서를 의미하는 것이 아닌 관련 없는 정보들을 의미.
+    
+	foreach($tableList as $table => $title){
+		//num을 기준으로 가장 최근의 content를 하나만 뽑아 온다.
+		$result = DBQuery("select num, substring(content, 1, 80) as content, wr_date from $table order by num desc limit 1");
+		if(mysqli_num_rows($result) > 0) {
+			$row = mysqli_fetch_array($result);
+			echo "<li><span class='prev'><a href='https://holosoft.co.kr/~kswj1510/oneboard/view.content.html?table=$table&num={$row['num']}&page=1'>{$row['content']}</a></span><span class='mid'> &nbsp; - " . date('Y년 m월 d일', $row['wr_date']) . " $title</span><span class='next'> <b>[</b><a href='https://holosoft.co.kr/~kswj1510/oneboard/list.html?table=$table'> 더 보기 </a> <b>]</b> </span></li>";
+		}
+	}
+	
+?>
+		</ul>
+	</div>
+    <div id = "annualEvents" ><br>
+    <div id="schedule" style=""> 연간일정</div>
+        <ul>
+<?php
+include_once './db.inc.php';
+$diary = array('diary' => '다이어리');
+$result = DBQuery("select *from diary where num != 'NULL' order by month desc limit 3");
+while($row = mysqli_fetch_array($result)){
+$diary_year = $row['year'];
+$diary_month = $row['month'];
+$diary_pdate = $row['pdate'];
+$diary_promise= $row['promise'];
+
+echo "<li><span id='diaryText'>" . $diary_year . "년 &nbsp;" . $diary_month . "월" . $diary_pdate . "일 &nbsp; ". $diary_promise . "</span></li>"; 
+}
+DBClose($result);
+?>
+            
+        </ul>
+
+    </div>
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="controller/main.js"></script>
+<!--<script>
+        setInterval(function(){
+        //jQUery를 호출하기만 하면 시작과 동시에 다음 코드가 수행되서 순서대로 안 됨. 따라서 콜백함수를 줘야 함.
+	$("#bestMoment > #bestMoment_foto > div:last").clone().prependTo($("#bestMoment_foto"));
+	$("#bestMoment > #bestMoment_foto > div:last").animate({left:"-1050px"}, 800, "linear", function() {
+		$(this).remove();
+	});
+    },2000);
+
+    </script>-->
+
+<?php
+include_once 'footer.inc.html';
+?>

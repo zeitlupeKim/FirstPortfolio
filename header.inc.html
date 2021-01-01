@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="Author" content="김동건">
+<meta name="Keywords" content="필요하면 만들자">
+<meta name="Description" content="할 수 있어">
+<title>header</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic&family=Nanum+Gothic+Coding&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://holosoft.co.kr/~kswj1510/css/base.css"/>
+
+<script >
+    function Login(){
+	//Verify ID
+	let userID = document.getElementById('userID').value;
+
+	if(!userID){
+		alert('아이디를 입력하세요');
+		document.getElementById('userID').focus();
+		return;
+	}
+	
+	//Verify PW
+	let userPW = document.getElementById('userPW').value;
+
+	if(!userPW){
+		alert('비밀번호를 입력하세요');
+		document.getElementById('userPW').focus();
+		return;
+	}
+
+	//Setting AJAX ansychronous communication
+	var xhr = new XMLHttpRequest();
+	xhr.onreadystatechange = function(){
+		if(this.readyState == 4 && this.status == 200){
+			if(this.responseText == 'OK'){
+				location.reload();
+			}
+			else{
+				alert('너도 법적으로 처벌받을 수 있습니다');
+			}
+		}
+	};
+
+	xhr.open('GET', 'https://holosoft.co.kr/~kswj1510/admin.login.php?id=' + userID + '&pw=' + userPW,true);
+	xhr.send();
+}
+
+function Logout(){
+	//Setting AJAX ansychronous communication
+	var xhr = new XMLHttpRequest();
+	xhr.onreadystatechange = function(){
+		if(this.readyState == 4 && this.status == 200){
+				location.reload();
+		}
+	};
+	
+	xhr.open('GET', 'https://holosoft.co.kr/~kswj1510/admin.logout.php', true);
+	xhr.send();
+}</script>
+</head>
+<body>
+	<div id="header">
+		<div id="h_top">
+            <div id="login">
+<?php
+//adminLogin 이라는 쿠키가 세팅되어져 있지 않거나 거기 안에 들어있는 값( adminLogin이  md5('_yes_') 와 같지 않으면 로그인 상태가 아니다
+if(! isset($_COOKIE['adminLogin']) || $_COOKIE['adminLogin'] != md5('_yes_')) {
+?>
+				<input type="text" id="userID" size="15" placeholder="아이디"/>
+				<input type="password" id="userPW" size="15" placeholder="비밀번호"/>
+				&nbsp;<a href="javascript: void(0);" onClick="Login();"> 로그인</a>&nbsp;
+
+<?php
+}
+else{
+?>
+				<span style="color: red; font-weight: bold;">관리자 모드  </span> &nbsp;
+				[&nbsp;<a href="javascript: void(0);" onClick="Logout();"> 로그아웃</a>&nbsp;]
+<?php
+}
+?>
+			</div>
+		</div><!-- Hier end the div Tag id="h_top" -->
+			<div id="h_bottom">
+				<ul class="mainMenu">
+					<li>
+						<!-- frame상의 루트에 있는 것은 top이다. top.name이라는 것은 frame 태그의  name=main의 주소 표시줄에 https://.../-->
+						<a href="javascript: void(0);" onClick = "top.main.location.href='https://holosoft.co.kr/~kswj1510/main.html';">HOME</a>
+					</li>
+					<li>
+						<a href="#">커뮤니티</a>
+						<ul class="subMenu">
+							<li>
+								<a href="https://holosoft.co.kr/~kswj1510/oneboard/list.html?table=board2">공지사항</a>
+							</li>
+							<li>
+								<a href="https://holosoft.co.kr/~kswj1510/oneboard/list.html?table=board1">질문과 답</a>
+							</li>
+							<li>
+								<a href="https://holosoft.co.kr/~kswj1510/oneboard/list.html?table=board0">자유게시판</a>
+							</li>
+						</ul>
+					</li>
+					<li>
+                        <a href="#">자료실</a>
+						<ul class="subMenu">
+							<li>
+								<a href="https://holosoft.co.kr/~kswj1510/repository/index.html?table=repository0">자료실0</a>
+							</li>
+							<li>
+								<a href="https://holosoft.co.kr/~kswj1510/repository/index.html?table=repository1">자료실1</a>
+							</li>
+							<li>
+								<a href="https://holosoft.co.kr/~kswj1510/repository/index.html?table=repository2">자료실2</a>
+							</li>
+                        </ul>
+					</li>
+                   
+                    <li>
+                            <a href="https://holosoft.co.kr/~kswj1510/gallary/index.html?table=gallary">갤러리</a>
+				    </li>
+                    <li>
+                        <a href = "https://holosoft.co.kr/~kswj1510/namecard/">명함만들기</a>
+                    </li>
+                    <li>
+                        <a href = "#">작품들</a>
+                        <ul  class="subMenu">
+                            <li>
+                                <a href = "https://holosoft.co.kr/~kswj1510/diary/">다이어리</a>
+                                
+                            </li>
+                            <li>
+                                <a href="https://holosoft.co.kr/~kswj1510/pos/index.html?table=pos">도서시스템</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+			</div>
+	</div>
+	<div id="divBody"><!-- divBody의 /div는 main.html에 있음-->
+
+

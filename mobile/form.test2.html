@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+    </head>
+    <body>
+        <div data-role="page">
+            <div data-role="header" data-position="fixed">>
+                <h1>로그인 처리</h1>
+            </div>
+            <div data-role="content" class="ui-content">
+<?php
+$id="babo";
+$pw="123456";
+
+if($_POST['userid'] == 'babo' && $_POST['userpw'] == '123456'){
+?>
+    로그인 처리가 완료되었습니다
+<?php
+}
+else{
+?>
+    <script>alert('확인 후 다시 로그인하십시오');
+        location.href='form.test.html';
+                </script>
+<?php
+}
+?>
+            </div>
+        </div>
+    </body>
+</html>

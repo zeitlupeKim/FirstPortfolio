@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="Author" content="HOLOSoft">
+<meta name="Keywords" content="게시판, OneBoard">
+<meta name="Description" content="필요하면 만들자 시리즈 1">
+<title>OneBoard</title>
+<link rel="stylesheet" href="./style/base.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:wght@300&family=Dosis&display=swap" rel="stylesheet"> 
+<style>
+#header { background-color: darkred; color:white; font-size: 2em;} 
+#mainTable { width: 100%; border-collapse: collapse; border-top: 2px solid black; border-bottom: 2px solid black; margin-top: 5px; background-color: l; }
+.th { border: 1px solid silver; padding: 15px; background-color: lightgray; }
+.td1 { border: 1px solid silver; width: 250px; text-align: right; padding: 8px 16px 8px 8px; background-color: none; }
+.td2 { border: 1px solid silver; padding: 8px 8px 8px 16px; }
+.td3 { border: 1px solid silver; padding: 15px; text-align: center; background-color: #f0f0f0; }
+.btn { width: 120px; cursor: pointer; }
+input, textarea { padding: 3px; }
+</style>
+
+<script>
+function Save(form) {
+	if (!/[^\s]{2,}/.test(form.name.value)) {
+		alert('이름은 필수입력 항목입니다.');
+		form.name.value = "";
+		form.name.focus();
+		return;
+	}
+
+	if (!/[^\s]{1,}/.test(form.title.value)) {
+		alert('제목은 필수입력 항목입니다.');
+		form.title.value = "";
+		form.title.focus();
+		return;
+	}
+
+	if (!/[^\s]{1,}/.test(form.content.value)) {
+		alert('내용은 필수입력 항목입니다.');
+		form.content.value = "";
+		form.content.focus();
+		return;
+	}
+
+<?php
+if (!isset($_COOKIE['admin']) || ($_COOKIE['admin'] != md5($_GET['table']))) {
+?>
+	if (!/[^\s]{4,}/.test(form.passwd.value)) {
+		alert('비밀번호는 필수입력 항목입니다.');
+		form.passwd.value = "";
+		form.passwd.focus();
+		return;
+	}
+<?php
+}
+?>
+
+	var fdata = new FormData(form);
+	var xhr = new XMLHttpRequest();
+	xhr.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			alert(this.responseText);
+			if (this.responseText == 'SAME_FILE_EXISTS') {
+				alert('같은 이름의 파일이 있습니다. 이름을 변경한 후 다시 업로드하십시오.');
+			}
+			else if (this.responseText == 'SAVE_ERROR') {
+				alert('파일을 저장할 수 없습니다. 관리자에게 문의하십시오.');
+			}
+			else if (this.responseText == 'PW_ERROR') {
+				alert('비밀번호가 일치하지 않습니다');
+			}
+			else if (this.responseText == 'OK') {
+				location.href = "view.content.html?<?='table=' . $_GET['table'] . '&num=' . $_GET['num'] . '&page=' . $_GET['page'] . '&field=' . $_GET['field'] . '&val=' . $_GET['val'];?>";
+			}
+		}
+	};
+
+	xhr.open('POST', 'modify.data.php?table=<?=$_GET['table'];?>&num=<?=$_GET['num'];?>&page=<?=$_GET['page'];?>&field=<?=$_GET['field'];?>&val=<?=$_GET['val'];?>', true);
+	xhr.send(fdata);
+}
+</script>
+</head>
+<body onLoad = "document.dataModify.name.focus();">
+<?php
+include_once '../db.inc.php';
+
+$result = DBQuery("select * from {$_GET['table']} where num = {$_GET['num']} limit 1");
+$row = mysqli_fetch_array($result);
+?>
+
+<div id="header">
+OneBoard
+</div>
+
+<div id="contents">
+	<form name="dataModify" method="post" enctype="multipart/form-data">
+		<table id="mainTable">
+			<tr>
+				<th colspan="2" class="th">글 쓰 기</th>
+			</tr>
+			<tr>
+				<td class="td1">이름</td>
+				<td class="td2">
+					<input type="text" name="name" value = "<?=$row['name'];?>" size="16" maxlength="8"/> &nbsp; &nbsp; &nbsp;
+					<input type="checkbox" name="cat" <?=($row['cat'] == 10) ? 'checked' : '';?>value="10"/>공지사항
+				</td>
+			</tr>
+			<tr>
+				<td class="td1">제목</td>
+				<td class="td2"><input type="text" name="title" value="<?=$row['title'];?>" size="50" maxlength="60"/></td>
+			</tr>
+			<tr>
+				<td class="td1">내용</td>
+				<td class="td2"><textarea name="content" rows="12" cols="80"><?=$row['content'];?></textarea></td>
+			</tr>
+			<tr>
+				<td class="td1">첨부 파일</td>
+				<td class="td2">
+<?php
+if ($row['file']) {
+	echo $row['file'];
+}
+else {
+	echo "<input type='file' name='file'/>";
+}
+?>
+				</td>
+			</tr>
+<?php
+if (!isset($_COOKIE['admin']) || ($_COOKIE['admin'] != md5($_GET['table']))) {
+?>
+			<tr>
+				<td class="td1">비밀번호</td>
+				<td class="td2"><input type="password" name="passwd"/></td>
+			</tr>
+<?php
+}
+?>
+			<tr>
+				<td colspan="2" class="td3">
+					<input type="button" value="확인" onClick="Save(this.form);" class="btn"/>
+					<input type="button" value="취소" onClick="history.go(-1);" class="btn"/>
+				</td>
+			</tr>
+		</table>
+	</form>
+</div>
+
+<div id="footer">
+Hall Of Logic Oriented Software - HOLOSoft
+</div>
+</body>
+</html>

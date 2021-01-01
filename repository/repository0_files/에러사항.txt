@@ -1,0 +1,64 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+    <title>Document</title>
+    <style>
+        * { margin: 0; padding:0; box-sizing:border-box; }
+    </style>
+</head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<body>
+    <?php
+    include_once '../db.inc.php';
+    $table = isset($_GET['table']) ? $_GET['table'] : 'practice_board0';
+    echo $table;
+    ?>
+    <form method="get" name="giveInform" enctype="multipart/form-data">
+        <table id="informTable" style="border:1px solid black;">
+            <th>파일 업로드</th>
+            <tr>
+                <td>이름</td>
+                <td>
+                    <input type="text" name="giveName" max="30" size="40">
+                </td>
+            </tr>
+            <tr>
+                <td>제목</td>
+                <td>
+                    <input type="text" name="giveTitle" max="30" size="40">
+                </td>
+            </tr>
+            <tr>
+                <td>내용</td>
+                <td>
+                    <input type="text" name="giveContent" max="30" size="40">
+                </td>
+            </tr>
+            <tr>
+                <td>파일</td>
+                <td>
+                    <input type="file" name="giveFile[]" max="30" size="40" multiple>
+                </td>
+            </tr>
+            <tr>
+               <td>비밀번호</td>
+               <td><input type="password" name="givePassword" size="40" maxlength="30" ><span style="color:gray;">(※네 글자 이상의 숫자 또는 영어로 시작)</span></td>
+            </tr>
+            <tr>
+               <td><input type="button" value="확인" onclick="submitInform(this.form);"><span style="color:gray;">(※네 글자 이상의 숫자 또는 영어로 시작)</span><br>
+               <input type="button" value="취소" onclick="history.go(-1);"></td>
+            </tr>
+        </table>
+    </form>
+</body>
+<script>
+
+document.getElementsByTagName('body')[0].onload = function(){
+        function submitInform(form){
+        alert('test');
+    }
+    
+}
+</script>
+</html>

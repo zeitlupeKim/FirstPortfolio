@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="Author" content="HOLOSoft"/>
+    <meta name="Keywords" content="mobile"/>
+    <meta name="Description" content="mobile"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>제목</title>
+    <link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
+    <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+</head>
+    <body>
+        <div data-role="page" id="page1">
+            <div data-role="header" data-position="fixed">
+                <h1> 모바일 폼 컨트롤 사용하기</h1>
+            </div>
+            
+            <div data-role="content" class="ui-content">
+                <label>도시 이름<input type="text" id="city"></label>
+                <label for="city2">도시이름</label>
+                <input type="text" id="city2" placeholder="도시 이름을 ...">
+                
+                <div data-role="fieldcontain">
+                    <label for="city3"> 도시 이름</label>
+                    <input type="text" id="city3">
+                    <label for="name">이름</label>
+                    <input type="text" id="name">
+                    <label for="nicKname">닉네임</label>
+                </div>
+            </div>
+            
+            <div data-role="none">
+                <label for="city2"> 도시 이름</label>
+                <input type="text" name="city2" id="city2" placeholder="도시 이름을 입력하세요">
+            </div>
+            
+            <div data-role="fieldcontain">
+                <label for="city3">도시이름</label>
+                <input type="text" name="city3" id="city3" placeholder="도시 이름을 입력하세요">
+            </div>
+            
+            <div data-role="fieldcontain">
+                <label for="pw">비밀번호</label><input type="password" name="pw" id="pw">
+                <label for="num">숫자</label><input type="number" name="num" id="num">
+                <label for="num">이메일</label><input type="email" name="email" id="email">
+                <label for="num">전화번호</label><input type="tel" name="tel" id="tel">
+                <label for="num">URL</label><input type="url" name="url" id="url">
+                <label for="num">검색</label><input type="search" name="search" id="search" placeholder=" 키워드를 입력하세요 ">
+            </div>
+            
+            <label>여러 줄 입력<textarea rows="5" cols="30" name="tarea" id="tarea"></textarea></label>
+            <label>슬라이더<input type="range" name="score" id="score" value="50" min="0" max="100"></label>
+            
+            <label for="age">나이</label>
+            <select id="age" data-native-menu="false" "multiple">
+                <option value="" data-placeholder="true">선택해보세요</option>
+                <option value="1">선택가능한 목록 1</option>
+                <option value="2">선택가능한 목록 2</option>
+                <option value="3">선택가능한 목록 3</option>
+                <option value="4">선택가능한 목록 4</option>
+
+            <!--footer-->
+            <div data-role="footer" data-position="fixed" class="ui-bar">
+            <h4>니미</h4>
+            <a href="#">페이지 이동</a>
+        </div>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,63 @@
+
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+ 
+ <style>
+	 * { padding:0; margin:0; box-sizing:border-box; }
+	 html, body { height: 100%; overflow: hidden; }
+	#main {width: 100%; height: 100%; border-collapse: collapse; }
+	#main .th { font-size:18px; background-color: ivory; padding: 10px; border:1px solid gray; }
+	#main .td1 { width: 120px; text-align:center; padding: 6px; font-weight: bold; background-color: #e0e0e0; border: 1px solid gray;}
+	#main .td2 { padding: 6px; border: 1px solid gray; }
+	#main .td3 { background-color: ghostwhite; border: 1px solid gray; text-align: center; padding: 10px;}
+	#main input { padding: 5px; }
+	#main .btn { width: 120px; cursor: pointer; border-radius: 5px; }
+
+ </style>
+<script>
+	function Check(form) {
+		if(!form.name.value){
+			alert('이름은 필수 항목입니다');
+			form.name.focus();
+			return ;
+		}
+		form.submit();
+	}
+</script>
+ </head>
+ <body onLoad="document.inputform.name.focus();">
+  <form name="inputForm" method="post" action="input.php" style="height:100%;" onSubmit="return false;"> <!-- post방식은 어떤 방식으로 전송하는지 근거가 남는다., action은 자동으로 실행이 된다.-->
+
+  <table id="main">
+	<tr>
+		<th colspan = "2" class = "th"> 자 료 입 력 </th>
+	</tr>
+	<tr>
+		<td class = "td1"> 이름 </td>
+		<td class = "td2"> <input type="text" name="name" size="12"  maxlength = "12"> </td>
+	</tr>
+	<tr>
+		<td class = "td1"> 전화번호 </td>
+		<td class = "td2"> <input type="text" name="tel"size="35"   maxlength = "15"> </td>
+	</tr>
+	<tr>
+		<td class = "td1"> 이메일</td>
+		<td class = "td2"> <input type="text" name="email" size="30" maxlength = "50"> </td>
+	</tr>
+	<tr>
+		<td class = "td1"> 비고 </td>
+		<td class = "td2"> <input type="text" name="etc" size="30" maxlength = "80"> </td>
+	</tr>
+	<tr>
+		<td colspan="2" class = "td3">
+			<input type="button" value="확인" onClick="Check(this.form);" class="btn"/>
+			<input type="button" value="취소" onClick="self.close();" class="btn"/>
+		</td>
+	</tr>
+  </table>
+  </form>
+ </body>
+</html>

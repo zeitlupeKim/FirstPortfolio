@@ -1,0 +1,173 @@
+<?php
+include_once '../header.inc.html';
+?>
+
+<link rel="stylesheet" href="view/index.css">
+
+<?php
+include_once '../db.inc.php';
+$table = isset($_GET['table']) ? $_GET['table'] : 'pos';
+$category = isset($_GET['Category']) ? $_GET['Category'] : '';
+$context = isset($_GET['context']) ? $_GET['context'] : '';
+
+$search = '';
+if ($category || $context){
+     $search= "and $category like '%$context%'"; 
+}
+
+/* The Database find for information from query $search */
+$isQueried = DBQuery("select * from $table where 1 $search;");
+$query = mysqli_fetch_array($isQueried);
+
+/* The Database find books that the Keywords is contained */
+$isCount = DBQuery("select count(num) from $table where 1 $search;");
+$CountQuery = mysqli_fetch_row($isCount);W
+?>
+<div id="catalogTitle"> Zeitlupe_kim 도서관리 시스템 </div>
+<div id="SearchBox">
+<form method="get" name="search">
+    <select name="Category" id="Category" onchange="selectCategory(this.form);">
+        <option value="NONE" >-----</option>
+        <option value="isbn" <?=($category == 'isbn') ? 'selected' : '';?>> ISBN</option>
+        <option value="title" <?=($category == 'title') ? 'selected' : '';?>>TITLE</option>
+        <option value="author" <?=($category == 'author') ? 'selected' : '';?>>AUTHOR</option>
+        <option value="publisch" <?=($category == 'publisch') ? 'selected' : '';?>>PUBLISCH</option>
+    </select>
+    <input type="text" name="context" id="context" value="<?=$context;?>" placeholder="검색 항목 입력">
+    <div id="signUp_btn" onclick="searchItem(document.search);">찾기</div>
+</form>
+
+</div>
+
+<!--Setting view Container-->
+<div id="listItemContainer">
+    <table id = "viewTable">
+        <tr id="firstRow">
+            <th class="num_column">번호</th>
+            <th class="isbn_column">ISBN</th>
+            <th class="title_column">서적명</th>
+            <th class="author_column">저자</th>
+            <th class="publisch_column">출판사</th>
+            <th class="quantity_column">수량</th>
+            <th class="price_column">가격</th>
+        </tr>
+<?php
+  $result = DBQuery("select *from $table");
+  while($FetchItem = mysqli_fetch_array($result)){
+      echo <<< TR
+          <tr class="onItemPoint">
+            <td class="num_column"> <a href="#">{$FetchItem['num']}</a> </td>
+            <td class="isbn_column"> <a href="#">{$FetchItem['isbn']}</a> </td>
+            <td class="title_column"> <a href="#">{$FetchItem['title']}</a> </td>
+            <td class="author_column"> <a href="#">{$FetchItem['author']}</a> </td>
+            <td class="publisch_column"> <a href="#">{$FetchItem['publisch']}</a> </td>
+            <td class="quantity_column"> <a href="#">{$FetchItem['quantity']}</a> </td>
+            <td class="price_column"> <a href="#">{$FetchItem['price']}</a> </td>
+          </tr>
+ TR;
+  }
+?>
+    </table>
+</div>
+    
+<!--Setting Control box-->
+<div id="controlContainer">
+   <fieldset id="controlBox1" >
+       <legend>입력하기</legend>
+           <form method="get" style="margin: 10px;">
+               <label>ISBN<br><input type="text" name="giveISBN"></label><br>
+               <label>서적명<br><input type="text" name="giveTitle"></label><br>
+               <label>저자<br><input type="text" name="giveAuthor"></label><br>
+               <label>출판사<br><input type="text" name="givePublisher"></label><br>
+               <label>수량<br><input type="number" min="0" max="100" name="giveQuantity"></label><br>
+               <label>가격<br><input type="text" name="givePrice"></label><br> 
+    <input type="button" id="button1" class="exeButton" value="실행" onclick="inputDB(this.form,'<?=$table;?>');">
+    <input type="button" id="button2" class="exeButton" value="자료 갱신" onclick="ScreenReload('<?=$query['title'];?>','<?=$table;?>');">
+           </form>
+
+
+   </fieldset>
+   <fieldset id="controlBox2">
+       <legend>정보</legend>
+       <span id="onScreen"></span>
+   </fieldset> 
+</div>
+
+<script>
+var onScreen = document.querySelector('#onScreen');
+    
+function selectCategory(getSearch){
+    if(getSearch.Category.selectedIndex == 0){
+         getSearch.context.value = '';
+         getSearch.submit();
+    }else{
+        getSearch.context.value = "";
+        getSearch.context.focus();
+    }
+   
+}
+    
+function searchItem(getItem){
+    if(/[가-힣a-zA-Z0-9(#?!@$%&*-\/)]/g.test(getItem.context.value)){
+        if(getItem.Category.selectedIndex > 0 && getItem.context.value){
+            getItem.submit();
+        }
+    }
+   else{
+        alert('찾을 내용을 입력하세요');
+    }
+}
+    
+function ScreenReload(getItem,getTable){
+    onScreen.innerHTML = "도서명:&nbsp;<?=$query['title'];?><br>"+"ISBN:&nbsp;<?=$query['isbn'];?><br>"+"저자:&nbsp;<?=$query['author'];?><br>"+"출판사:&nbsp;<?=$query['publisch'];?><br>"+"수량:&nbsp;<?=$query['quantity'];?><br>" + "가격:<?=$query['price'];?><br>" + "'<?=$context;?>'관련 서적 수량:&nbsp;<?=$CountQuery[0];?>";
+    
+}
+    
+function test(){
+    alert('test');
+}
+    
+
+/*Setting input data into DB*/
+function inputDB(isData,isTable){
+ if(! isData.giveISBN.value){
+     alert("ISBN을 입력하세요");
+     return;
+ }
+ if(! isData.giveTitle.value){
+     alert("서적명을 입력하세요");
+     return;
+ }
+ if(! isData.giveAuthor.value){
+     alert("저자를 입력하세요");
+     return;
+ }
+    
+ if( isData.giveQuantity.value > 500){
+     alert("최대 보유량을 초과했습니다");
+     return;
+ }
+    xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function(){
+        if(this.readyState == 4 && this.status == 200){
+            
+            if(this.responseText == 'NULL_VALUE'){
+                alert('ERROR!');
+            }
+            if(this.responseText == 'OK'){
+            /*화면 자동갱신*/
+             location.href="index.html";
+            }
+        }
+    };
+    
+    xhr.open('GET','inputDB.php?table=' + isTable + '&ISBN=' + isData.giveISBN.value + '&title=' + isData.giveTitle.value + '&author=' + isData.giveAuthor.value + '&publisch=' + isData.givePublisher.value + '&quantity=' + isData.giveQuantity.value + '&price=' + isData.givePrice.value,true);
+    xhr.send();
+    
+    document.querySelectorAll('.giveInform')[0].focus();
+}
+
+</script>
+<?php
+include_once '../footer.inc.html';
+?>

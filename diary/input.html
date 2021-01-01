@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="Author" content="김동건"/>
+<meta name="Keywords" content="포트폴리오 연습 준비"/>
+<meta name="Description" content="개처럼 일해서 가볍게 떠나자"/>
+<title>연습</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; }
+#main { width: 100%; height: 100%; border-collapse: collapse; }
+.th { background-color: lavender; padding: 10px; border: 1px solid silver; }
+.td1 { width: 100px; font-weight: bold; padding: 5px; background-color: ghostwhite; text-align: center; border: 1px solid silver; }
+.td2 { padding: 5px 5px 5px 10px; border: 1px solid silver; }
+.td3 { padding: 10px; background-color: #e0e0e0; text-align: center; border: 1px solid silver; }
+.bold { font-weight: bold; }
+.input { padding: 3px; }
+.btn { width: 100px; cursor: pointer; border-radius: 8px; }
+</style>
+
+<script>
+function Save(form) {
+	if (!form.promise.value) {
+		alert('내용은 필수입력 항목입니다.');
+		form.promise.focus();
+		return;
+	}
+
+	form.submit();
+}
+</script>
+</head>
+<body onLoad="document.inputForm.promise.focus();">
+<form name="inputForm" method="post" action="input.php" style="height: 100%;">
+	<input type="hidden" name="year" value="<?=$_GET['year'];?>"/>
+	<input type="hidden" name="month" value="<?=$_GET['month'];?>"/>
+	<input type="hidden" name="pdate" value="<?=$_GET['pdate'];?>"/>
+	<table id="main">
+		<tr>
+			<th colspan="2" class="th">내용 입력하기</th>
+		</tr>
+		<tr>
+			<td class="td1">날 짜</td>
+			<td class="td2 bold"><?=$_GET['year'];?>년 <?=$_GET['month'];?>월 <?=$_GET['pdate'];?>일</td>
+		</tr>
+		<tr>
+			<td class="td1">시 각</td>
+			<td class="td2"><input type="text" name="ptime" size="8" maxlength="10" class="input"/> &nbsp; <span style="color: gray;">(※필요시만 입력)</span></td>
+		</tr>
+		<tr>
+			<td class="td1">내 용</td>
+			<td class="td2"><input type="text" name="promise" size="30" maxlength="14" class="input"/></td>
+		</tr>
+		<tr>
+			<td colspan="2" class="td3">
+				<input type="button" value="확인" class="input btn" onClick="Save(this.form);"/>
+				<input type="button" value="취소" class="input btn" onClick="self.close();"/>
+			</td>
+		</tr>
+	</table>
+</form>
+</body>
+</html>

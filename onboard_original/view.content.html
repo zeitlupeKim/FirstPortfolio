@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="Author" content="kim">
+<meta name="Keywords" content="게시판, OneBoard">
+<meta name="Description" content="필요하면 만들자 시리즈 1">
+<title>OneBoard</title>
+<link rel="stylesheet" href="./style/base.css"/>
+<style>
+#mainTable { width: 100%; border-collapse: collapse; border-top: 2px solid skyblue; border-bottom: 2px solid skyblue; table-layout: fixed; margin-top: 1px; margin-bottom: 1px; }
+.td1 { width: 150px; text-align: right; border: 1px solid silver; padding: 10px 20px 10px 10px; background-color: ghostwhite; }
+.td2 { border: 1px solid silver; padding: 10px 20px; text-align: justify; }
+.td3 { border: 1px solid silver; padding: 15px; text-align: center; background-color: #f0f0f0; }
+.btn { width: 120px; padding: 2px; cursor: pointer; border-radius: 5px; }
+.btn2 { width: 40px; padding: 2px; cursor: pointer; border-radius: 6px; font-size: 11px; }
+
+#cmtsContainer { margin-top: 10px; }
+#cmts_input > table { width: 100%; margin-top: 10px; border-collapse: collapse; border-top: 1px solid black; border-bottom: 1px solid black; }
+#cmts_input > table .cmt_th1 { background-color: ghostwhite; text-align: center; width: 120px; padding: 2px; border: 1px solid silver; }
+#cmts_input > table .cmt_th2 { background-color: ghostwhite; text-align: center; padding: 2px; border: 1px solid silver; }
+#cmts_input > table .cmt_th3 { background-color: ghostwhite; text-align: center; padding: 2px; width: 100px; border: 1px solid silver; }
+#cmts_input > table .cmt_td1 { text-align: center; width: 120px; padding: 5px 7px; border: 1px solid silver; }
+#cmts_input > table .cmt_td2 { text-align: center; padding: 5px 7px; border: 1px solid silver; }
+#cmts_input > table .cmt_td3 { text-align: center; width: 100px; padding: 5px 7px; border: 1px solid silver; }
+#cmts_input #name { width: 100%; height: 45px; padding: 3px; text-align: center; }
+#cmts_input #comment { width: 100%; height: 45px; padding: 2px; }
+#cmts_input #btn { width: 100%; height: 45px; cursor: pointer; border-radius: 8px; }
+
+#cmts_list fieldset { border: 1px gray dotted; margin-top: 10px; padding: 8px; }
+</style>
+
+<script>
+function Modify(table, num, page, field, val) {
+	location.href = 'modify.html?table=' + table + '&num=' + num + '&page=' + page + '&field=' + field + '&val=' + val;
+}
+
+function Delete(table, num, page, field, val) {
+	var answer;
+
+<?php
+if (isset($_COOKIE['admin']) && $_COOKIE['admin'] == md5($_GET['table'])) {
+?>
+	answer = confirm('현재의 게시물을 지울까요?');
+<?php
+}
+else {
+?>
+	answer = prompt('비밀번호를 입력하십시오.', '');
+<?php
+}
+?>
+
+	if (answer) {
+		var xhr = new XMLHttpRequest();
+		xhr.onreadystatechange = function() {
+			if (this.readyState == 4 && this.status == 200) {
+				if (this.responseText == 'PW_ERROR') {
+					alert('비밀번호가 일치하지 않습니다. 확인 후 다시 시도하십시오.');
+				}
+				else if (this.responseText == 'OK') {
+					location.href = 'list.html?table=<?=$_GET['table'];?>&page=<?=$_GET['page'];?>&field=<?=$_GET['field'];?>&val=<?=$_GET['val'];?>';
+				}
+			}
+		};
+
+		xhr.open('GET', 'delete.data.php?table=' + table + '&num=' + num + '&passwd=' + answer, true);
+		xhr.send();
+	}
+}
+
+function SaveCmt(table, num) {
+	var name = document.getElementById('name').value;
+	if (!/[^\s]{2,}/.test(name)) {
+		alert('이름을 입력하십시오.');
+		document.getElementById('name').value = "";
+		document.getElementById('name').focus();
+		return;
+	}
+
+	var cmt = document.getElementById('comment').value;
+	if (!/[^\s]+/.test(cmt)) {
+		alert('댓글 내용을 입력하십시오.');
+		document.getElementById('comment').value = "";
+		document.getElementById('comment').focus();
+		return;
+	}
+
+	var xhr = new XMLHttpRequest();
+	xhr.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			document.getElementById('cmtsCount').innerText = parseInt(document.getElementById('cmtsCount').innerText) + 1;
+			document.getElementById('cmts_list').innerHTML += this.responseText;
+		}
+	};
+
+	xhr.open('GET', 'cmt.save.php?table=' + table + '&b_num=' + num + '&name=' + name + '&comment=' + cmt, true);
+	xhr.send();
+
+	document.getElementById('name').value = "";
+	document.getElementById('comment').value = "";
+}
+
+function IncGood(table, num) {
+	var xhr = new XMLHttpRequest();
+	xhr.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			document.getElementById('cmt_good_' + num).innerText = this.responseText;
+		}
+	};
+
+	xhr.open('GET', 'cmt.inc.good.php?table=' + table + '&num=' + num, true);
+	xhr.send();
+}
+
+function IncBad(table, num) {
+	var xhr = new XMLHttpRequest();
+	xhr.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 200) {
+			document.getElementById('cmt_bad_' + num).innerText = this.responseText;
+		}
+	};
+
+	xhr.open('GET', 'cmt.inc.bad.php?table=' + table + '&num=' + num, true);
+	xhr.send();
+}
+</script>
+</head>
+<body>
+<div id="header">
+OneBoard
+</div>
+
+<div id="contents">
+<?php
+include_once '../db.inc.php';
+$result = DBQuery("select * from {$_GET['table']} where num = {$_GET['num']} limit 1");
+$row = mysqli_fetch_array($result);
+$num = $row['num'];
+$name = $row['name'];
+$title = $row['title'];
+$content = $row['content'];
+$wr_date = date('Y-m-d H:i', $row['wr_date']);
+$up_date = ($row['up_date'] > 0) ? '(수정 : ' . date('Y-m-d H:i', $row['up_date']) . ')' : "";
+$ip = $row['ip'];
+$ref = $row['ref'];
+$cat = $row['cat'];
+$file = $row['file'];
+
+mysqli_free_result($result);
+?>
+
+	<table id="mainTable">
+		<tr>
+			<td class="td1">이 름</td>
+			<td class="td2">
+				<b><?=$name;?></b>
+				<div style="float: right; text-align: right;">
+					<input type="checkbox" value="<?=$cat;?>"<?=($cat == 10) ? ' checked' : '';?>> 공지사항 <span style="color: silver;">|</span> 업로드 : <?=$wr_date;?> <?=$up_date;?> <span style="color: silver;">|</span> IP : <?=$ip;?> <span style="color: silver;">|</span> 읽음 : <?=$ref;?>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td class="td1">제 목</td>
+			<td class="td2"><b><?=$title;?></b></td>
+		</tr>
+		<tr>
+			<td class="td1">내 용</td>
+			<td class="td2"><?=nl2br($content);?></td>
+		</tr>
+<?php
+if ($file) {
+?>
+		<tr>
+			<td class="td1">첨부 파일</td>
+			<td class="td2"><a href="<?='./files/' . $_GET['table'] . '/' . $file;?>"><?=$file;?></a></td>
+		</tr>
+<?php
+}
+?>
+		<tr>
+			<td colspan="2" class="td3">
+				<input type="button" value="수정" onClick="Modify('<?=$_GET['table'];?>', <?=$_GET['num'];?>, <?=$_GET['page'];?>, '<?=$_GET['field'];?>', '<?=$_GET['val'];?>');" class="btn"/>
+				<input type="button" value="삭제" onClick="Delete('<?=$_GET['table'];?>', <?=$_GET['num'];?>, <?=$_GET['page'];?>, '<?=$_GET['field'];?>', '<?=$_GET['val'];?>');" class="btn"/> &nbsp; &nbsp; 
+				<input type="button" value="목록으로" onClick="location.href='list.html?table=<?=$_GET['table'];?>&page=<?=$_GET['page'];?>&field=<?=$_GET['field'];?>&val=<?=$_GET['val'];?>';" class="btn"/>
+			</td>
+		</tr>
+	</table>
+
+	<div id="cmtsContainer">
+<?php
+$result = DBQuery("select count(num) from {$_GET['table']}_cmts where b_num = {$_GET['num']}");
+$row = mysqli_fetch_row($result);
+$cmtsCount = $row[0];
+?>
+		<div>
+			▒ 댓글 : <b><span id="cmtsCount"><?=$cmtsCount;?></span></b> 개
+		</div>
+		<div id="cmts_input">
+			<table>
+				<tr>
+					<td class="cmt_th1">이름</td>
+					<td class="cmt_th2">댓 &nbsp; &nbsp; 글</td>
+					<td class="cmt_th3">확 인</td>
+				</tr>
+				<tr>
+					<td class="cmt_td1"><input type="text" id="name" maxlength="16"/></td>
+					<td class="cmt_td2"><textarea id="comment"></textarea></td>
+					<td class="cmt_td3"><input type="button" id="btn"value="댓글 등록" onClick="SaveCmt('<?=$_GET['table'];?>', <?=$_GET['num'];?>);"/></td>
+				</tr>
+			</table>
+		</div>
+		<div id="cmts_list">
+<?php
+if ($cmtsCount > 0) {
+	$cmts = DBQuery("select * from {$_GET['table']}_cmts where b_num = {$_GET['num']} order by num asc");
+	while($cmt = mysqli_fetch_array($cmts)) {
+		$wr_time = date('Y년 n월 j일 H:i', $cmt['wr_time']);
+?>
+			<fieldset>
+				<legend>[ <b><?=$cmt['name'];?></b> ] &nbsp;<span style='color: silver;'>|</span>&nbsp; [ 시각 : <?=$wr_time;?> ] &nbsp;<span style='color: silver;'>|</span>&nbsp; [ IP : <?=$cmt['ip'];?> ]</legend>
+				<?=nl2br($cmt['comment']);?>
+				<div style='text-align: right; padding-right: 30px;'>
+					<input type="button" value="좋아요" class="btn2" onClick="IncGood('<?=$_GET['table'];?>', <?=$cmt['num'];?>);"/> <span id="cmt_good_<?=$cmt['num'];?>"><?=$cmt['good'];?></span> &nbsp;<span style="color: silver;">|</span>&nbsp; 
+					<input type="button" value="싫어요" class="btn2" onClick="IncBad('<?=$_GET['table'];?>', <?=$cmt['num'];?>);"/> <span id="cmt_bad_<?=$cmt['num'];?>"><?=$cmt['bad'];?></span>
+				</div>
+			</fieldset>
+<?php
+	}
+}
+?>
+		</div>
+	</div>
+</div>
+
+<div id="footer">
+kim
+</div>
+<?php
+DBQuery("update {$_GET['table']} set ref = ref + 1 where num = {$_GET['num']} limit 1");
+DBClose();
+?>
+</body>
+</html>

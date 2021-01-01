@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="Author" content="HOLOSoft"/>
+    <meta name="Keywords" content="mobile"/>
+    <meta name="Description" content="mobile"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>제목</title>
+    <link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
+    <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+</head>
+    <body>
+        <div data-role="page" id="page1">
+            <div data-role="header" data-position="fixed">
+                <h1> 모바일 폼 컨트롤 사용하기</h1>
+            </div>
+            
+            <div data-role="content" class="ui-content">
+                <label for="gender">스위치</label>
+                <select name="gender" id="gender" data-role="slider">
+                    <option value="m">남자</option>
+                    <option value="f">여자</option>
+                </select>
+            </div>
+            
+            <fieldset data-role="controlgroup">
+                <legend>라디오 버튼 1</legend>
+                <input type="radio" name="syear" id="syear1" value="1" checked>
+                <label for = "syear1"> 1학년 </label>
+                <input type="radio" name="syear" id="syear2" value="2">
+                <label for = "syear2"> 2학년 </label>
+                <input type="radio" name="syear" id="syear3" value="3">
+                <label for = "syear3"> 3학년 </label>
+                
+            </fieldset>
+            
+            <fieldset data-role="controlgroup" data-type="horizontal" >
+                <legend>라디오 버튼 2</legend>
+                <input type="radio" name="semester" id="semester1" value="1" checked>
+                <label for="semester1"> 1학년 </label>
+                <input type="radio" name="semester" id="semester2" value="2">
+                <label for="semester2"> 2학년 </label>
+                <input type="radio" name="semester" id="semester3" value="3">
+                <label for="semester3"> 3학년 </label>
+                <input type="radio" name="semester" id="semester4" value="4">
+                <label for="semester4"> 4학년 </label>
+                <input type="radio" name="semester" id="semester5" value="5">
+                <label for="semester5"> 5학년 </label>
+                <input type="radio" name="semester" id="semester6" value="6">
+                <label for="semester6"> 6학년 </label>
+            </fieldset>
+            
+            <fieldset data-role="controlgroup" data-type="horizontal">
+                <legend> 다음 중에서 맘대로 골라보세요 </legend>
+                <input type="checkbox" id="chk1" value="선택1"><label for="chk1">선택요소 1</label>
+                <input type="checkbox" id="chk2" value="선택2"><label for="chk2">선택요소 2</label>
+                <input type="checkbox" id="chk3" value="선택3"><label for="chk3">선택요소 3</label>
+                <input type="checkbox" id="chk4" value="선택4"><label for="chk4">선택요소 4</label>
+                <input type="checkbox" id="chk5" value="선택5"><label for="chk5">선택요소 5</label>
+            </fieldset>
+            <!--footer-->
+            <div data-role="footer" data-position="fixed" class="ui-bar">
+            <h4>니미</h4>
+            <a href="#">페이지 이동</a>
+        </div>
+        </div>
+    </body>
+    <script>
+    $(document).ready(function(){
+        $('#btn1').click(function(){
+            alert()
+        });
+    });
+    </script>
+</html>

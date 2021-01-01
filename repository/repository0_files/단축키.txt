@@ -1,0 +1,4 @@
+닷지도구는 밝게
+번도구는 어둡게
+전경색은 alt + delete
+배경색은 ctrl + delete

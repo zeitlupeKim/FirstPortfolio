@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+    <meta charset="UTF-8">
+    <meta name="Generator" content="EditPlus®">
+    <meta name="Author" content="">
+    <meta name="Keywords" content="">
+    <meta name="Description" content="">
+    <title>Document</title>
+    <style>
+        * {margin:0; padding:0; box-sizing:border-box; }
+        html, body { width:100%; height: 100%; position:relative; background-color: rgb(240,240,240); overflow:hidden; }
+        #containerOfAll{ width:600px; height: 600px; position: absolute; display:flex;  left:50%; margin-left: -300px; top: 50%; margin-top: -300px;}
+        #inputSection{ width:100%; height: 100%; background-color: rgb(250, 250, 250); text-align:center; border-radius: 5px; }
+        #inputTitle { width: 100%; height: 60px; text-align:center; font-size:2em; line-height:60px; }
+        #inputInformArea{width: 100%; height: calc(100% - 60px); position:relative;}
+        #inputName { text-align:center; position:relative; top:30px; }
+        .inform_Frame { width: 250px; height: 40px; margin: 10px 0; border: none; border-bottom: 1px solid black; background-color: rgb(250,250,250); }
+        #signUp_btn { width: 250px; height: 40px; position:absolute; bottom: 5%; border-radius:5px; left:50%; margin-left:-125px; text-align:center; cursor:pointer; line-height: 40px; background-color:#0067a3; color:white; }
+    </style>
+</head>
+<body>
+    <div id="containerOfAll">
+        <div id="inputSection">
+            <div id="inputTitle">서적등록</div>
+            <div id="inputInformArea">
+                <div id="inputName">
+                    <div id="ctrContainer">
+                        <span>ISBN</span><br>
+                        <input type="text" class="giveInform"><br>
+                        <span>서적명</span><br>
+                        <input type="text" class="giveInform"><br>
+                        <span>저자</span><br>
+                        <input type="text" class="giveInform"><br>
+                        <span>출판사</span><br>
+                        <input type="text" class="giveInform"><br>
+                        <span>수량</span><br>
+                        <input type="text" class="giveInform"><br>
+                        <span>가격</span><br>
+                        <input type="text" class="giveInform"><br>
+                </div>
+                <div id="signUp_btn">가입하기</div>    
+            </div>
+           
+        </div>
+    </div>
+</body>
+</html>

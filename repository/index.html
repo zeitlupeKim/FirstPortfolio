@@ -1,0 +1,324 @@
+<?php
+
+/* header 함수는 뒤로가기와 관련해서 편의성이 있음. */
+header('Cache-Control: no-store, no-cache, must-revalidate');
+header('Cache-Control: post-check=0, pre-check=0', false);
+header('Pragma: no-cache');
+
+/******************************************************************************************
+list.html을 실행하지 않았으면 이 쿠키가 존재하지 않음. 
+데이터를 업로드/수정 등은 이 쿠키가 존재하는가? 하지 않는가를 먼저 점검해야 함.
+******************************************************************************************/
+
+setcookie('_view_list_repository0_', md5('yes'), 0, '/');
+include_once '../header.inc.html';
+?>
+
+<style>
+/*Setting contents: contents is a top container in the tags*/
+#contents { width: 1000px; margin: 10px auto 5px auto; padding-left: calc((100vw - 100%) / 2); }
+#contents a { text-decoration: none; color: rgb(30,30,30); }
+#contents a:hover { text-decoration: none; color: rgb(30,30,30); font-weight: bold; }
+
+/* Setting roomInfo: roomInfo contains in tag contents and perfomences as single */
+#roomInfo { width: 100%; }
+#roomInfo > #ri_left { float: left; padding: 0 2px 5px 2px; }
+#roomInfo > #ri_right { float: right; padding:  0 2px 5px 2px; text-align: right; }
+
+/* Setting List: List is a table id */
+#list { width: 100%; border-collapse: collapse; table-layout: fixed; border-top: 2px solid black; border-bottom: 2px solid black; }
+.th { padding: 5px; border: none; background-color: #281F1D;  color:white;}
+.td { padding: 6px; border: none; border-bottom: 1px solid silver; }
+.tdCenter { padding: 6px; border: none; border-bottom: 1px solid silver;  text-align: center; }
+ .tdCenter > a {text-decoration:none; color:rgb(30,30,30);}
+.tdEllipsis { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tdBlank { color: gray; height: 120px; }
+
+/* Setting Tag of div pageLink: Show lower Page Number */
+#pageLink { text-align: center; }
+#lists_per_page { padding: 2px 1px; border:none; border-bottom: 1px solid black; background-color:rgb(250,250,250); text-align:center; width:50px; font-weight:bold; }
+#etc { width:100%; display: flex; justify-content:center;}
+#etc > #listCount { width: 400px; }
+#etc > #upload { width: 200px; text-align: center; }
+#etc > #search { width: 400px; text-align: right; }
+.search { padding: 3px; }
+</style>
+
+<script>
+    /**************************************************************
+    *********************비공개 파일 로직 구현************************
+    **************************************************************/
+    function ShowContent(isPrivate, table, num, page, field, val){
+        if(isPrivate == 'Y'){
+           var pw = prompt('비공개 자료입니다. 비밀번호를 입력하십시오.');
+           if(pw){
+               var xhr= new XMLHttpRequest();
+               xhr.onreadystatechange = function(){
+                   if(this.readyState == 4 && this.status == 200){
+                       if(this.responseText == 'OK'){
+                           location.href = 'view.content.html?table=' + table + '&num=' + num + '&page=' + page + '&field=' + field + '&val=' + val;
+                       }
+                       else{
+                           alert('비밀번호가  일치하지 않습니다. 확인 후 다시 시도하십시오');
+                       }
+                   }
+               };
+               
+               //repository0의 x번호의 비밀번호는 다음과 같음을 전송.
+               xhr.open('GET','verify.pw.php?table=' + table + '&num=' + num + '&password=' + pw,true);
+               xhr.send();
+           }
+           else{
+               return ;
+           }
+        }
+        else{
+            location.href = 'view.content.html?table=' + table + '&num=' + num + '&page=' + page + '&field=' + field + '&val=' + val;
+        }
+    }
+    
+    
+    
+    /*********************************************************************************
+    ****************Setting view Data on the in the List on the screen****************
+    **********************************************************************************/
+    function SetLists(){
+        var lists = document.getElementById('lists_per_page').value; //lists는 페이지당 숫자.
+        var today = new Date();
+        //exp는 새로운 날짜. 현재로부터 30일 이후의 미래 날짜를 구함.
+        var exp = new Date(today.getTime() + 24 * 60 * 60 * 1000 * 90); 
+        //쿠키 세팅. 쿠키에 페이지당 숫자를 값으로 넣어두고, 만료는 30일 후로 기약.
+        document.cookie = 'dr_lists_per_page =' + lists + '; expires=' + exp.toUTCString();
+        location.reload(); //화면 갱신   
+    }
+    
+    //검색 상태를 빠져 나갈 때 기능. 예를 들어 검색의 --------를 선택하면 index.html을 다시 실행
+    
+    /***********************************************************************************
+    ********************This function performence for search box************************
+    ***********************************************************************************/
+    function SelectChanged(form){
+        if (form.field.selectedIndex == 0){ //selectedIndex는 속성
+            alert('초기화');
+            /*form.val.value="";
+            form.submit();*/
+        }
+        else{
+            form.val.value = "";
+            form.val.focus();
+        }
+    }
+    
+     /*
+    ************************************************************************************
+    ************************This function performence for Search************************
+    ************************************************************************************
+    */
+    function Search(form){
+        if (form.field.selectedIndex > 0 && form.val.value){
+            form.submit();
+        }
+        else{
+            alert('검색 조건을 입력하십시오');
+        }
+    }
+</script>
+
+<div id="contents">
+<?php
+include_once '../db.inc.php';
+
+/* 
+*********************************Setting Page State********************************
+$lists_per_page = 10; //한 화면에 보여줄 수 있는 목록의 수
+$links_per_block = 15; //페이지 한 묶음을 block이라고 정의함. 
+***********************************************************************************
+*/
+
+
+//쿠키가 세팅되어 있다면 쿠키값, 아니면 lists_per_page의 값을 10으로 세팅
+$lists_per_page = isset($_COOKIE['dr_lists_per_page']) ? $_COOKIE['dr_lists_per_page'] : 5 ; 
+$links_per_block = 5;  
+
+$table = isset($_GET['table']) ? $_GET['table'] : 'repository0'; 
+$board_title = '자료실'; //테이블 이름에 따라 다른 이름을 부여, 
+
+switch($table) {
+  
+   /********************************************************
+   ********************table Setting************************
+   *********************************************************/
+   
+    case 'repository1' : $board_title = '자료실1'; break; 
+    case 'repository2' : $board_title = '자료실2'; break; 
+}
+
+
+//GET방식은 아래의 form에 있는 내용.
+$field = isset($_GET['field']) ? $_GET['field'] : '';
+$val = isset($_GET['val']) ? $_GET['val'] : '';
+
+
+$search = '';
+$msg = '전체 자료수';
+if ($field || $val){
+     $search= "and $field like '%$val%'"; 
+     $msg = '검색된 자료수';
+}
+
+
+ //화면에 몇 페이지를 보여줘야 하는가?
+$page = isset($_GET['page']) ? $_GET['page'] : 1;
+
+//행 갯수 가져오기
+$total_count = mysqli_fetch_row(DBQuery("select count(num) from $table where 1 $search"))[0];
+
+//ceil 함수: 해당 숫자가 속한 구간의 정수 최댓값 반환. 페이지 블록 숫를 구하기 위해서 이용.
+$total_page = ceil($total_count / $lists_per_page);
+
+if ($page > $total_page) {
+    $page = $total_page;
+}
+echo $val;
+?>
+    <div id="roomInfo">
+        <div id="ri_left">🎁<?=$board_title;?></div>
+        <div id="ri_right">전체 자료수 : <strong> <?=$total_count;?> </strong> ( <strong><?=$page;?> </strong> / <?=$total_page;?> ) </div>
+    </div>
+    
+    <table id="list">
+        <tr>
+            <th class="th" width="60">순번</th>
+            <th class="th">제목</th>
+            <th class="th" width="120">올린이</th>
+            <th class="th" width="120">날짜</th>
+            <th class="th" width="60">조회수</th>
+        </tr>
+        <!--DB에서 자료를 전송받아 출력...-->
+        <!--전체 페이지 - (현재 페이지-1) * 페이지당 숫자(10)-->
+<?php
+if ($total_count > 0) {
+	$start = ($page - 1) * $lists_per_page;
+	$result = DBQuery("select * from $table where 1 $search order by num desc limit $start, $lists_per_page"); //테이블로부터 인덱스 값을 추출해서 내림차순 정렬
+
+	$v_num = $total_count - ($page - 1) * $lists_per_page; 
+
+/*
+****************************************************************************
+************************Show on the screen the Data ************************
+****************************************************************************
+*/
+
+	while($row = mysqli_fetch_array($result)){
+    //Y는 개인적인 자료임을 의미 
+	    $isPrivate = ($row['isPrivate'] == 'Y') ? "<img src='lock.png' style='height:18px; vertical-align:bottom; height:18px;'/>" :'';
+	    //댓글이 몇 개나 있는지
+	    $cmts_count = mysqli_fetch_row(DBQuery("select count(num) from {$table}_cmts where b_num = {$row['num']}"))[0];
+	    
+        $cmt = ($cmts_count > 0) ? "<span style='color:gray;'>[" . $cmts_count . "]</span>" : '';
+		$wtime = date('Y-m-d', $row['wtime']);
+		$ref = number_format($row['ref']);
+		echo <<< TR
+    <tr>
+        <td class="tdCenter" width="60" > $v_num </td>
+        
+        <!--
+        <td class="td tdEllipsis"><a href="view.content.html?table=$table&num={$row['num']}&page=$page&field=$field&val=$val">{$row['title']}</a>$isPrivate $cmt</td>
+        -->
+        
+        <td class="td tdEllipsis"><a href="javascript:void(0)" onclick="ShowContent('{$row['isPrivate']}','$table',{$row['num']},$page,'$field', '$val');">{$row['title']}</a>$isPrivate $cmt</td>
+        <td class="tdCenter" width="100" > {$row['name']} </td>
+        <td class="tdCenter" width="100"> $wtime </td>
+        <td class="tdCenter" width="60"> $ref </td>
+    </tr>
+
+TR;
+		$v_num--;
+	}
+/* Unlock the Memory*/
+
+	DBClose($result); 
+}
+else {
+?>
+        <tr>
+            <td colspan="5" class="tdCenter tdBlank">등록된 자료가 없습니다.</td>
+        </tr>
+<?php
+}
+?>
+    </table>
+
+<?php
+   if($total_count > 0){ //만약 게시물의 숫자가 0개 이상이면 하단 페이지를 보여준다. 
+?>
+   <!--Show lower Page Number-->
+    <div id="pageLink">
+         <?php
+         $block = ceil($page / $links_per_block); // 한 페이지 블록을 만들어낸다.
+         // 단위 블록당 구간의 첫 번째 페이지 구현 1페이지, 11페이지, 21페이지 ...
+         $sp = ($block - 1) * $links_per_block + 1;
+         $ep = $block * $links_per_block;
+         if($ep > $total_page){
+             $ep = $total_page;
+         }
+         
+         if($block > 1){ //블록이 1보다 크면
+            echo "<a href='index.html?page=" . ($sp - 1) . "&fiel$field&val=$val'> 이전 </a>&nbsp"; //이전 블록으로 보내기    
+         }
+             
+    /*
+        ****************************************************************************
+        *************perfomence to show on the Screen the number *******************
+        ****************************************************************************
+    */
+         for($p = $sp; $p <= $ep; $p++){
+                 if($p == $page){
+                  echo "<span style='color:rgb(30,30,30); font-weight:bold;'> $p </span>&nbsp;";
+                 }else
+                 {
+                   echo "<a href='index.html?page=$p&fiel$field&val=$val'>$p</a>&nbsp;";
+                 }
+                     
+            
+         }
+                 if($total_page > $ep){
+                    echo "<a href= 'index.html?page=" . ($ep + 1) . "&fiel$field&val=$val'>다음</a>";
+                 }
+     ?>
+        
+<?php
+}
+?>
+    </div>
+    <div id="etc">
+        <div id="listCount">
+            화면당 목록수
+            <!--
+            onChange="SetLists()은 내용물이 변경이 된다면, SetLists라는 함수를 호출.
+            쿠키를 등록해놓고 화면 갱신을 하려는 시도.
+            -->
+            <input id = "lists_per_page" type="number" value="<?=$lists_per_page;?>" min="1" max="100" onchange="SetLists();"> 
+        </div>
+        <div id="upload"><a href="data.upload.html?table=<?=$table;?>">업로드</a></div>
+        <div id="search">
+           <!-- 페이지나 검색이나 모두 한 방식으로 통일. 여기서는 get방식-->
+            <form method="get"> 
+                <input type="text" name="val" value="<?=$val;?>" size="15" style="padding: 3px; border:none; border-bottom: 1px solid black; background-color:rgb(250,250,250)">
+                    <select name="field" style="padding:3px; width:80px;" onchange="SelectChanged(this.form);">
+                        <option value="">---------</option>
+                        <option value="title" <?=($field == 'title') ? 'selected' : '';?>>제목</option>
+
+                        <option value="content" <?=($field == 'content') ? 'selected' : '';?>>내용</option>
+                        <option value="name" <?=($field == 'name') ? 'selected' : '';?>>올린이</option>
+                        <option value="file" <?=($field == 'file') ? 'selected' : '';?>>파일 이름</option>
+                    </select>
+                <input type="button" value="확인" onclick="Search(this.form);" style="padding:0 6px; cursor:pointer;">
+            </form>
+        </div>
+    </div>
+</div>
+
+<?php
+include_once '../footer.inc.html';
+?> 

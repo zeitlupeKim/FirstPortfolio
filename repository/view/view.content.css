@@ -1,0 +1,23 @@
+#contents {width: 1000px; margin: 15px auto 5px auto; font-size: 15px; padding-left: calc((100vw - 100%) / 2); }
+
+#mainTable { width: 100%; border-collapse: collapse; border-top: 2px solid skyblue; border-bottom: 2px solid skyblue; table-layout: fixed; }
+ 
+.td1 { width: 150px; text-align: right; border: 1px solid silver; padding: 10px 20px 10px 10px; background-color: ghostwhite; }
+.td2 { border: 1px solid silver; padding: 10px 20px; text-align: justify; }
+.td3 { border: 1px solid silver; padding: 15px; text-align: center; background-color: #f0f0f0; }
+.btn { width: 120px; padding: 2px; cursor: pointer; border-radius: 5px; }
+.btn2 { width: 40px; padding: 2px; cursor: pointer; border-radius: 6px; font-size: 11px; }
+
+#cmtsContainer { margin-top: 10px; }
+#cmts_input > table { width: 100%; margin-top: 10px; border-collapse: collapse; border-top: 1px solid black; border-bottom: 1px solid black; }
+#cmts_input > table .cmt_th1 { background-color: ghostwhite; text-align: center; width: 120px; padding: 2px; border: 1px solid silver; }
+#cmts_input > table .cmt_th2 { background-color: ghostwhite; text-align: center; padding: 2px; border: 1px solid silver; }
+#cmts_input > table .cmt_th3 { background-color: ghostwhite; text-align: center; padding: 2px; width: 100px; border: 1px solid silver; }
+#cmts_input > table .cmt_td1 { text-align: center; width: 120px; padding: 5px 7px; border: 1px solid silver; }
+#cmts_input > table .cmt_td2 { text-align: center; padding: 5px 7px; border: 1px solid silver; }
+#cmts_input > table .cmt_td3 { text-align: center; width: 100px; padding: 5px 7px; border: 1px solid silver; }
+#cmts_input #name { width: 100%; height: 45px; padding: 3px; text-align: center; }
+#cmts_input #comment { width: 100%; height: 45px; padding: 2px; }
+#cmts_input #btn { width: 100%; height: 45px; cursor: pointer; border-radius: 8px; }
+
+#cmts_list fieldset { border: 1px gray dotted; margin-top: 10px; padding: 8px; }

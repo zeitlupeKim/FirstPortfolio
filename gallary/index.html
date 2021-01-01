@@ -1,0 +1,225 @@
+<?php
+include_once '../header.inc.html';
+include_once '../db.inc.php';
+setcookie('board_list_view', md5('yes'), 0, '/'); 
+$result = DBQuery("select count(num) from gallery");
+$row = mysqli_fetch_row($result);
+$total = $row[0];
+?>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; overflow: hidden; }
+
+#picList { width: 1000px; height: 80px; margin: 0 auto; border-collapse: collapse; background-color: black; }
+.td_prev { width: 50px; height: 80px; }
+.td_next { width: 50px; height: 80px; text-align: right; }
+.tdList { width: 60px; height: 80px; background-color: gray; text-align: center; vertical-align: bottom; }
+.smallImg { width: 58px; height: 78px; cursor: pointer; } 
+
+#currPic { width: 1000px; height: calc(100% - 80px - 40px - 12px); margin: 0 auto; }
+#currPic > #pic { height: calc(100% - 40px); background-position: center; background-repeat: no-repeat; background-size: contain; display: flex; justify-content: center; align-items: center; }
+#currPic > #picInfo { height: 40px; line-height: 40px; text-align: center; }
+#control { width: 1000px; position: fixed; bottom: 30px; height: 40px; line-height: 40px; left: 50%; margin-left: -500px; text-align: center; background-color: rgb(250,250,250); } 
+    #control > a { color:rgb(30,30,30);}
+</style>
+
+<script>
+var COUNT = 15;
+
+var NUMS = [];
+var PICS = [];
+var NAMES = [];
+var TITLES = [];
+var UPTIMES = [];
+var TOTAL = <?=$total;?>;
+var FIRST = 0;
+
+if (TOTAL > 0) {
+<?php
+$i = 0;
+$result = DBQuery("select * from gallery order by num desc");
+while($row = mysqli_fetch_array($result)) {
+	$upTime = date('Y-m-d', $row['upTime']);
+	echo "NUMS[$i] = {$row['num']}; PICS[$i] = '{$row['pic']}'; NAMES[$i] = '{$row['name']}'; TITLES[$i] = '{$row['title']}'; UPTIMES[$i] = '$upTime';";
+	
+	$i++;
+}
+
+DBClose($result);
+?>
+}
+
+function UploadPic() {
+	var w = 580;
+	var h = 320;
+	var x = (screen.width - w) / 2;
+	var y = (screen.height - h) / 2;
+
+	window.open('upload.pic.html', 'upload', 'width=' + w + ', height=' + h + ', left=' + x + ', top=' + y);
+}
+
+function UploadPic2() {
+	var w = 580;
+	var h = 320;
+	var x = (screen.width - w) / 2;
+	var y = (screen.height - h) / 2;
+
+	window.open('upload.pic2.html', 'upload', 'width=' + w + ', height=' + h + ', left=' + x + ', top=' + y);
+}
+
+function Next() {
+	if (FIRST + COUNT < TOTAL) {
+		FIRST++;
+	}
+
+	if (FIRST + COUNT >= TOTAL) {
+		document.getElementById('next').innerHTML = "<img src='next2.png' style='width: 40px; height: 80px;'/>";
+	}
+
+	document.getElementById('prev').innerHTML = "<img src='prev1.png' onClick='Prev();' style='width: 40px; height: 80px; cursor: pointer;'/>";
+
+	var cnt = (FIRST + COUNT > TOTAL) ? TOTAL - FIRST : COUNT;
+	for(var i = 0; i < cnt; i++) {
+		document.getElementById('num_' + i).innerHTML = "<img src='./pics/" + PICS[FIRST + i] + "' class='smallImg' onClick='ShowPic(" + (FIRST + i) + ");'/>"
+	}
+}
+
+function Prev() {
+	if (FIRST != 0) {
+		FIRST--;
+	}
+
+	if (FIRST == 0) {
+		document.getElementById('prev').innerHTML = "<img src='prev2.png' style='width: 40px; height: 80px;'/>";
+	}
+
+	if (FIRST + COUNT < TOTAL) {
+		document.getElementById('next').innerHTML = "<img src='next1.png' onClick='Next();' style='width: 40px; height: 80px; cursor: pointer;'/>";
+	}
+
+	var cnt = (FIRST + COUNT > TOTAL) ? TOTAL - FIRST : COUNT;
+	for(var i = 0; i < cnt; i++) {
+		document.getElementById('num_' + i).innerHTML = "<img src='./pics/" + PICS[FIRST + i] + "' class='smallImg' onClick='ShowPic(" + (FIRST + i) + ");'/>"
+	}
+}
+
+function ShowPic(pos) {
+	document.getElementById('pic').innerHTML = "";
+
+	document.getElementById('pic').style.backgroundImage = "url('./pics/" + PICS[pos] + "')";
+	document.getElementById('picInfo').innerHTML = "[" + (pos + 1) + "/" + TOTAL + "] " + TITLES[pos] + " &nbsp; | &nbsp; " + NAMES[pos] + " &nbsp; | &nbsp; " + UPTIMES[pos] + " &nbsp; | &nbsp; <span onClick='Delete(" + pos + ");' style='cursor: pointer;'>지우기</span>";
+}
+
+function Delete(pos) {
+	var pw = prompt('비밀번호를 입력하십시오.');
+
+	if (pw) {
+		var xhr = new XMLHttpRequest();
+		xhr.onreadystatechange = function() {
+			if (this.readyState == 4 && this.status == 200) {
+				if (this.responseText == 'PW_ERROR') {
+					alert('비밀번호가 일치하지 않습니다. 확인 후 다시 시도합시오.');
+				}
+				else if (this.responseText == 'OK') {
+					TOTAL--;
+					NUMS.splice(pos, 1);
+					NAMES.splice(pos, 1);
+					PICS.splice(pos, 1);
+					TITLES.splice(pos, 1);
+					UPTIMES.splice(pos, 1);
+					document.getElementById('pic').innerHTML = "사진을 지웠습니다.";
+					document.getElementById('picInfo').innerHTML = "";
+					document.getElementById('pic').style.backgroundImage = 'none';
+					
+					var picList = "<table id='picList'><tr><td class='td_prev'><span id='prev'></span></td>";
+
+					var count = (FIRST + COUNT > TOTAL) ? TOTAL - FIRST : COUNT;
+					for(var i = 0; i < count; i++) {
+						picList += "<td class='tdList'><span id='num_" + i + "'><img src='./pics/" + PICS[FIRST + i] + "' class='smallImg' onClick='ShowPic(" + (FIRST + i) + ");'/></span></td>";
+					}
+
+					for(var i = count; i < COUNT; i++) {
+						picList += "<td class='tdList'><span id='num_" + i + "'></span></td>";
+					}
+
+					picList += "<td class='td_next'><span id='next'></span></td></tr></table>";
+
+					document.getElementById('picList').innerHTML = picList;
+
+					if (FIRST == 0) {
+						document.getElementById('prev').innerHTML = "<img src='prev2.png' style='width: 40px; height: 80px;'/>";
+					}
+					else {
+						document.getElementById('prev').innerHTML = "<img src='prev1.png' onClick='Prev();' style='width: 40px; height: 80px; cursor: pointer;''/>";
+					}
+
+					if (FIRST + COUNT >= TOTAL) {
+						document.getElementById('next').innerHTML = "<img src='next2.png' style='width: 40px; height: 80px;'/>";
+					}
+					else {
+						document.getElementById('next').innerHTML = "<img src='next1.png' onClick='Next();' style='width: 40px; height: 80px; cursor: pointer;'/>";
+					}
+				}
+			}
+		};
+
+		xhr.open('GET', 'delete.pic.php?pw=' + pw + '&num=' + NUMS[pos], true);
+		xhr.send();
+	}
+}
+
+function SlideShow() {
+	window.open('show.fs.html', '_top', 'fullscreen=yes');
+}
+</script>
+
+<table id="picList">
+	<tr>
+		<td class="td_prev"><span id="prev"></span></td>
+		<!-- 썸네일 이미지 출력 -->
+		<script>
+		var count = (FIRST + COUNT > TOTAL) ? TOTAL - FIRST : COUNT;
+		for(var i = 0; i < count; i++) {
+			document.write("<td class='tdList'><span id='num_" + i + "'><img src='./pics/" + PICS[FIRST + i] + "' class='smallImg' onClick='ShowPic(" + (FIRST + i) + ");'/></span></td>");
+		}
+
+		for(var i = count; i < COUNT; i++) {
+			document.write("<td class='tdList'><span id='num_" + i + "'></span></td>");
+		}
+		</script>
+		<td class="td_next"><span id="next"></span></td>
+	</tr>
+</table>
+<script>
+if (FIRST == 0) {
+	document.getElementById('prev').innerHTML = "<img src='prev2.png' style='width: 40px; height: 80px;'/>";
+}
+else {
+	document.getElementById('prev').innerHTML = "<img src='prev1.png' onClick='Prev();' style='width: 40px; height: 80px; cursor: pointer;''/>";
+}
+
+if (FIRST + COUNT >= TOTAL) {
+	document.getElementById('next').innerHTML = "<img src='next2.png' style='width: 40px; height: 80px;'/>";
+}
+else {
+	document.getElementById('next').innerHTML = "<img src='next1.png' onClick='Next();' style='width: 40px; height: 80px; cursor: pointer;'/>";
+}
+</script>
+
+	<div id="currPic">
+		<div id="pic"></div>
+		<div id="picInfo">그림정보</div>
+	</div>
+	<script>
+	document.getElementById('pic').style.backgroundImage = "url('./pics/" + PICS[FIRST] + "')";
+	document.getElementById('picInfo').innerHTML = "[1/" + TOTAL + "] " + TITLES[FIRST] + " &nbsp; | &nbsp; " + NAMES[FIRST] + " &nbsp; | &nbsp; " + UPTIMES[FIRST] + " &nbsp; | &nbsp; <span onClick='Delete(" + FIRST + ");' style='cursor: pointer;'>지우기</span>";
+	</script>
+	<div id="control">
+		<!--<a href="javascript: void(0);" onClick="UploadPic();">사진 올리기 - 기본</a> &nbsp;-->
+		<a href="javascript: void(0);" onClick="UploadPic2();">사진 올리기</a> &nbsp;
+		<a href="javascript: void(0);" onClick="SlideShow();">슬라이드 쇼</a>
+	</div>
+<?php
+include_once '../footer.inc.html';
+?>

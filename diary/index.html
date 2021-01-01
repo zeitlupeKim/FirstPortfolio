@@ -1,0 +1,203 @@
+<?php
+include_once '../header.inc.html';
+/*
+header('Cache-Control: no-store, no-cache, must-revaildate');
+header('Cache-Control: post-check=0, pre-check=0', false);
+header('pragma:no-frama');
+*/
+?>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+#main { width: 98%; margin: 10px auto; border-collapse: collapse; border-top: 2px solid black; border-bottom: 2px solid black; }
+#today { float: left; width: 300px; font-size: 20px; font-weight: bold;}
+#control { float: right; width: 300px; text-align: right; font-size: 18px; font-weight: bold; }
+#date4print:hover { cursor: pointer; background-color: #281F1D; color: white; font-weight: bold; }
+.border { border: 1px solid #e0e0e0; padding: 5px; }
+.gold { background-color: #281F1D; padding: 15px; color:white; }
+.width { width: 14%; }
+.contents { font-size:16px; }
+#delete { color:red; }
+#delete:hover { cursor: pointer; }
+</style>
+
+<script>
+function Prev(form) {
+	var year = form.year.value;
+	var month = form.month.value;
+
+	month--;
+	
+	if (month < 1) {
+		month = 12;
+		year--;
+	}
+
+	form.year.value = year;
+	form.month.value = month;
+
+	form.submit();
+}
+
+function Next(form) {
+	var year = form.year.value;
+	var month = form.month.value;
+
+	month++;
+	
+	if (month > 12) {
+		month = 1;
+		year++;
+	}
+
+	form.year.value = year;
+	form.month.value = month;
+
+	form.submit();
+}
+
+function Input(year, month, date) {
+	var w = 400;
+	var h = 220;
+	var x = (screen.width - w) / 2;
+	var y = (screen.height - h) / 2;
+
+	window.open('input.html?year=' + year + '&month=' + month + '&pdate=' + date, 'inputDate', 'width=' + w + ', height=' + h + ', left=' + x + ', top=' + y + ', resizable=no');
+}
+
+function Delete(num) {
+	var ans = confirm("정말로 지우시겠습니까?");
+	
+	if(ans){ //비교를 안함//
+		var xhr = new XMLHttpRequest(); //(예시)붕어빵틀로 붕어빵을 찍어낸다.
+		xhr.onreadystatechange = function(){
+			
+			if(this.readyState == 4 && this.status == 200){ //상태코드 0,1,2,3,4,5 뜻: 클라이언트쪽에서 전송이 끝났다 그리고 서버에서는 처리가 정상적으로 이루어졌다)
+				alert(this.responseText);
+				if( this.responseText == 'OK'){
+					location.reload(); 
+				}
+			}
+		};
+		
+		xhr.open('GET', 'delete.php?num=' + num, true); //메서드, url, 비동기적(참/거짓)
+		xhr.send();
+	}
+}
+
+</script>
+<?php
+include_once '../db.inc.php';
+
+$year = isset($_GET['year']) ? $_GET['year'] : date('Y');
+$month = isset($_GET['month']) ? $_GET['month'] : date('n');
+
+$today = date('Y년 m월 d일');
+$days = array('일', '월', '화', '수', '목', '금', '토');
+$day = $days[date('w')];
+?>
+<table id="main">
+	<tr>
+		<td colspan="7" class="border gold">
+			<div id="today"><?=$today;?>(<?=$day;?>요일)</div>
+			<div id="control">
+				<form method="get">
+					<input type="button" value="이전" onClick="Prev(this.form);">
+					<span id="year"><?=$year;?></span>년
+					<span id="month"><?=$month;?></span>월
+					<input type="button" value="다음" onClick="Next(this.form);"/>
+					<input type="hidden" name="year" value="<?=$year;?>"/>
+					<input type="hidden" name="month" value="<?=$month;?>"/>
+				</form>
+			</div>
+		</td>
+	</tr>
+	<tr style="background-color: lavender;">
+		<th class="border width" style="color: red;">일</th>
+		<th class="border width">월</th>
+		<th class="border width">화</th>
+		<th class="border width">수</th>
+		<th class="border width">목</th>
+		<th class="border width">금</th>
+		<th class="border width" style="color: blue;">토</th>
+	</tr>
+<?php
+$lastDate = date('t', mktime(0, 0, 0, $month, 1, $year));
+$firstDay = date('w', mktime(0, 0, 0, $month, 1, $year));
+$countTd = 0;
+
+for ($d = 1; $d <= $lastDate; $d++) {
+	if ($countTd % 7 == 0) {
+		echo "<tr height='90'>";
+	}
+
+	if ($d == 1) {
+		while($firstDay--) {
+			echo "<td class='width border'></td>";
+			$countTd++;
+		}
+	}
+
+	$color = 'black';
+	if ($countTd % 7 == 0) {
+		$color = 'red';
+	}
+	else if ($countTd % 7 == 6) {
+		$color = 'blue';
+	}
+
+	$bgcolor = "";
+	if ($year == date('Y') && $month == date('n') && $d == date('j')) {
+		$bgcolor = "background-color: #281F1D;";
+	}
+
+	//DB에 찍을 날짜에 해당하는 행사가 있는지 query!!
+	$result = DBQuery("select *from diary where year = $year and month = $month and pdate = $d");
+	$contents = "";
+	$authority = "";
+	
+	
+	while($row = mysqli_fetch_array($result)) {
+		$ptime = "";
+		if($row['ptime']){
+			$ptime = '('. $row['ptime'].')';
+
+		}
+		
+        //(식)? "참":"거짓"은 if문하고 같다. 그런데 한 줄로 처리할 수 있기 때문에 매우 단순
+        //만약 쿠키 값이 있다(=로그인상태)? "그러면 x표시" : "아니면 거짓"
+        $isAdmin = (isset($_COOKIE['adminLogin']) && $_COOKIE['adminLogin'] == md5('_yes_')) ? "<span id='delete' onClick= 'Delete({$row['num']});'>X</span>" : '' ;
+	
+	
+		$contents .= "<div class = 'contents'>■{$row['promise']} $ptime $isAdmin </div>";
+	}
+
+
+
+	echo "<td class='width border' style='color: $color; vertical-align: top; $bgcolor'><span id='date4print' onClick='Input($year, $month, $d);'>$d</span>$contents</td>";
+	
+	$countTd++;
+
+	if ($countTd % 7 == 0) {
+		echo "</tr>";
+	}
+}
+
+if ($countTd % 7 != 0) {
+	$rest = 7 - ($countTd % 7);
+	while($rest--) {
+		echo "<td class='width border'></td>";
+	}
+	echo "</tr>";
+}
+?>
+
+<!-- 
+while($row = mysqli_fetch_array($result)) {
+		$contents .= 의 의미: 이어 붙인다
+
+		"<div>{$row['promise']} </div>"; 집합 괄호가 필요한 이유: 토큰 의미를 해석하는데 작은 따움표, 큰 따움표의 의미가 혼동되기 때문에 집합괄호로 묶어서 괄호 구분.
+-->
+</table>
+<?php
+include_once '../footer.inc.html';
+?>

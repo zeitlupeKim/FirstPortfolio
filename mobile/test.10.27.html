@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="Author" content="HOLOSoft"/>
+    <meta name="Keywords" content="mobile"/>
+    <meta name="Description" content="mobile"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>제목</title>
+    <link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
+    <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+</head>
+<body>
+<!--
+   ************************************************************
+   *********************innerpage******************************
+   ************************************************************
+-->
+    <!--Setting header in this document-->
+    <div data-role="page" id="page1" data-theme="b">
+        <div data-role="header" data-position="fixed">
+           <h1>1페이지</h1>
+            <a href="#page2" data-transition="flip">다음</a>
+        <div data-role="navbar">
+            <ul>
+                <li><a href="#">메뉴 1</a></li>
+                <li><a href="#">메뉴 2</a></li>
+                <li><a href="#">메뉴 3</a></li>
+                <li><a href="#">메뉴 4</a></li>
+                
+            </ul>
+        </div>
+        </div>
+        
+        <div data-role="content" class="ui-content">
+            <!--<div style="font-size:50px;" data-transition = "slideUp">나도 <span style="color:red;">소스로 </span>우려먹을 수 있다!</div><hr>
+            <div style="font-size:50px;" data-transition = "slideUp">광컴직업전문학교</div><hr>-->
+            
+        <div data-role="content">
+            <img src="../image/background.jpg" style="position:relative; width:100%; height: 200px;">
+        </div>
+           <a href="test.10.26.01.html" style="font-size:50px; " data-transition = "slide">웹개발은 이상한 세계</a><br>
+            <ul data-role="listview" data-inset="true">
+                <li><a href="mailto:dholosoft@daum.net">전화</a></li>
+                <li><a href="sms:010-0000-0000" target="_blank">sms</a></li>
+                <li><a href="https://maps.google.com/maps?=대한민국+광주광역시+북구+유동" target="_blank">주소</a></li>
+                <li><a href="https://maps.google.com/maps?q=34.316497,126.760252" target="_blank">위성좌표</a></li>
+            </ul>
+            <hr>
+            <h1> 버튼 사용하기</h1>
+            <!--속성을 여러 가지 적용하는 것도 가능하다-->
+            <a href="#" data-role="button">버튼 1</a>
+            <a href="#" data-role="button" data-inline="true">버튼 2</a>
+            <a href="#" data-role="button" data-inline="true" data-mini="true">버튼 3</a>
+            <a href="#" data-role="button" data-corners="false">버튼 4</a>
+            <a href="#" data-role="button" data-shadow="false">버튼 5</a>
+            <hr>
+            <button data-inline="true">버튼6</button>
+            <button type="reset">초기화</button>
+            <button type="submit">초기화</button>
+            <input type="button" value="나도 버튼" data-icon="home">
+            
+            <div data-role="controlgroup">
+                <input type="button" value="버튼1">
+                <input type="button" value="버튼2">
+                <input type="button" value="버튼3">
+                <input type="button" value="버튼4">
+                <input type="button" value="버튼5">
+                <input type="button" value="버튼6">
+                <input type="button" value="버튼7">
+            </div>
+            <hr>
+            <ul data-role="listview" data-inset="true" data-count-theme="a">
+                <li>리스트 1</li>
+                <li>리스트 2</li>
+                <li>리스트 3</li>
+            </ul>
+            <ul data-role="listview" data-filter="true" data-filter-placeholder="검색어 입력" data-inset="true">
+                <li>강물이 흘러가거나 말거나</li>
+                <li>강하면서 부드러우면 더 좋아</li>
+                <li>바다는 파랗다</li>
+                <li>안 파랄 때도 있다</li>
+            </ul>
+        </div>
+        
+        <div data-role="page" id="page2" data-theme="b">
+            <div data-role="header" data-position="fixed">
+                <h1>2페이지</h1>
+                <a href="#page1" data-transition="flip">이전</a>
+                 <a href="#page3" data-transition="flip">다음</a>
+            </div>
+        </div>
+        <div data-role="page" id="page3" data-theme="b" .class="ui-bar">
+            <div data-role="header" data-position="fixed">
+            <h1>여기는 마지막 페이지</h1>
+            <a href="#page1" data-transition="flip">처음으로 이동</a>
+            </div>
+        </div>
+        
+           <ul data-role="listview" data-inset="true">
+                <li data-role="list=devider">멀티라인 리스트 뷰</li>
+                <li>
+                    <a href="#">
+                        <p class="ul-li-aside">2020년 10월 27일 개봉 예정</p>
+                        <h4> 재미있는 영화 1</h4>
+                        <p>등급 : 12세 이상 관람가</p>
+                        <p>줄거리: 기승전 재밌다. 두 번 봐도 재밌다</p>
+                    </a>
+                </li>
+            </ul>
+            <ul data-role="listview" data-inset="true">
+                <li data-role="list=devider">멀티라인 리스트 뷰</li>
+                <li>
+                    <a href="#">
+                        <p class="ul-li-aside">2020년 10월 27일 개봉 예정</p>
+                        <h4> 재미있는 영화 2</h4>
+                        <p>등급 : 19세 이상 관람가</p>
+                        <p>줄거리: 기승전 재밌다. 세 번 봐도 재밌다. 애들이 보면 안된다. </p>
+                    </a>
+                </li>
+            </ul>
+        <!--setting footer-->
+        <div data-role="footer" data-position="fixed" class="ui-bar">
+            <h4>니미</h4>
+            <a href="#">페이지 이동</a>
+        </div>
+    </div>
+
+</body>    
+</html>
+        
+
+   
